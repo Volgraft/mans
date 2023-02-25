@@ -87,11 +87,11 @@ ls
 
 # создание папки ssh на удаленном сервере
 #ssh [remote_username]@[server_ip_address] mkdir -p .ssh
-ssh vol@188.120.225.8 mkdir -p .ssh
+ssh vol@volgraft.ru mkdir -p .ssh
 
 # скопировать публичный ключ на удаленный сервер
 # scp .\[key.pub] [remote_username]@[server_ip_address]:/home/vol/.ssh/[key.pub]
-scp ~/.ssh/my.pub vol@188.120.225.8:/home/vol/.ssh/key.pub
+scp ~/.ssh/key.pub vol@volgraft.ru:/home/vol/.ssh/key.pub
 
 # подключится к удаленному серверу по ssh
 
