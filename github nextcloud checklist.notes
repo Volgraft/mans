@@ -463,7 +463,10 @@ sudo php /var/www/nextcloud/occ maintenance:update:htaccess
 sudo chmod 660 /var/www/nextcloud/config/config.php
 sudo chown root:www-data /var/www/nextcloud/config/config.php
 
-// ИСТОЧНИКИ
+///////////////
+// ИСТОЧНИКИ //
+///////////////
+
 # https://docs.nextcloud.com/server/latest/admin_manual/configuration_server
 # https://www.youtube.com/@LearnLinuxTV/videos
 # https://www.youtube.com/@NerdOnTheStreet/videos
