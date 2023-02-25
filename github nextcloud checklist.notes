@@ -101,6 +101,15 @@ sudo vim /etc/ssh/sshd_config
     PasswordAuthentication no
     PermitRootLogin yes
 
+# Включить ssh агент
+Start-Service ssh-agent 
+    Get-Service ssh-agent
+    Get-Service ssh-agent | Select StartType
+    Get-Service -Name ssh-agent | Set-Service -StartupType Manual
+
+# Добавить ключ в SSH агент
+# ssh-add <path to new private key file>
+ssh-add c:/Users/admin/.ssh/volgraft
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 002. Установка и настройка NextCloud (установка сервера, базы данных; монтирование директории data) //
