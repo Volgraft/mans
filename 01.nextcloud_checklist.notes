@@ -289,22 +289,15 @@ sudo vim /var/www/nextcloud/config/config.php
   'maintenance' => false,
 
 ----------------------------------------------------------------
-4. "Удалить index.php из URL"
-sudo vim /var/www/nextcloud/config/config.php
-  'htaccess.RewriteBase' => '/',
-
-sudo php /var/www/nextcloud/occ maintenance:update:htaccess
-
-----------------------------------------------------------------
-5. "Убрать ошибку Image Magick error"
+4. "Убрать ошибку Image Magick error"
 sudo apt install libmagickcore-6.q16-6-extra
 
 ----------------------------------------------------------------
-6. "Настроить certbot"
+5. "Настроить certbot"
 https://certbot.eff.org/instructions
 
 ----------------------------------------------------------------
-7. "Enabling Strict Transport Security"
+6. "Enabling Strict Transport Security"
 sudo vim /etc/apache2/sites-available/nextcloud-le-ssl.conf
 
 <IfModule mod_ssl.c>
@@ -316,7 +309,7 @@ sudo vim /etc/apache2/sites-available/nextcloud-le-ssl.conf
 </IfModule>
 
 ----------------------------------------------------------------
-8. "Reditect to 443"
+7. "Reditect to 443"
 sudo vim /etc/apache2/sites-available/nc-redir.conf
 
 <VirtualHost *:80>
@@ -330,7 +323,7 @@ sudo vim /etc/apache2/sites-available/nc-redir.conf
 sudo systemctl restart apache2
 
 ----------------------------------------------------------------
-9. "Настроить cron"
+8. "Настроить cron"
 
 sudo apt install cron
 sudo systemctl enable cron
@@ -340,7 +333,7 @@ sudo crontab -e
 sudo crontab -l
 
 ----------------------------------------------------------------
-10. "Настроить redis"
+9. "Настроить redis"
 ps ax | grep redis
 sudo apt install redis-server php-redis
 ps ax | grep redis
@@ -369,7 +362,7 @@ sudo vim /var/www/nextcloud/config/config.php
 
 
 ----------------------------------------------------------------
-11. "Настроить fail2ban"
+10. "Настроить fail2ban"
 sudo apt install fail2ban
 
 sudo cp /etc/fail2ban/fail2ban.conf /etc/fail2ban/fail2ban.local
@@ -425,13 +418,13 @@ sudo systemctl restart fail2ban
 sudo systemctl status fail2ban
 
 ----------------------------------------------------------------
-12. "ufw"
+11. "ufw"
 sudo apt-get install ufw 
 sudo vim /etc/default/ufw 
   IPV6=yes
 
 ----------------------------------------------------------------
-13. "Логи"
+12. "Логи"
 sudo vim /var/www/nextcloud/config/config.php
   # в конец
   'log_type' => "file",
@@ -447,6 +440,13 @@ sudo systemctl restart apache2
 # lnav - просмотр логов
 sudo tail -n 100 /var/log/nextcloud.log
 sudo tail -n 100 /var/log/apache2/nextcloud.log
+
+----------------------------------------------------------------
+13. "Удалить index.php из URL"
+sudo vim /var/www/nextcloud/config/config.php
+  'htaccess.RewriteBase' => '/',
+
+sudo php /var/www/nextcloud/occ maintenance:update:htaccess
 
 ----------------------------------------------------------------
 14. "Настроить права доступа к nextcloud/config/config.php"
