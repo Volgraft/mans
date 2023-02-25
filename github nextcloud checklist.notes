@@ -68,6 +68,44 @@ network:
 
 sudo netplan try 
 
+----------------------------------------------------------------
+9. "Добавить пользователя"
+adduser vol
+usermod -aG sudo vol
+
+----------------------------------------------------------------
+10. "Настроить SSH по ключу"
+# linux
+sudo apt install openssh
+# windows 
+winget install openssh
+
+# перейти в папку .ssh на локальной машине
+cd ~/.ssh
+
+# Сгенерировать ключ на локальной машине
+ssh-keygen -t rsa -b 4096
+
+# создание папки ssh на удаленном сервере
+#ssh [remote_username]@[server_ip_address] mkdir -p .ssh
+ssh vol@188.120.225.8 mkdir -p .ssh
+
+# скопировать публичный ключ на удаленный сервер
+# scp .\[key.pub] [remote_username]@[server_ip_address]:/home/vol/.ssh/[key.pub]
+scp .\volgraft.ru.pub vol@188.120.225.8:/home/vol/.ssh/volgraft.ru.pub
+
+# подключится к удаленному серверу по ssh
+
+# экспорт публичного ключа в uthorized_keys
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys' 
+
+# отредактировать sshd_config
+sudo vim /etc/ssh/sshd_config 
+    Port 2322 # поменять порт SSH
+    UsePAM yes
+    PasswordAuthentication no
+    PermitRootLogin yes
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // 002. Установка и настройка NextCloud (установка сервера, базы данных; монтирование директории data) //
@@ -178,6 +216,8 @@ sudo a2ensite nextcloud.conf
 
 ----------------------------------------------------------------
 13. "Конфигурирование appache сервера"
+# sudo vim /etc/php/8.1/apache2/php.ini
+
 # провести проверку текущих настроек через cat
 cat /etc/php/8.1/apache2/php.ini | grep 'memory_limit = '
 cat /etc/php/8.1/apache2/php.ini | grep 'upload_max_filesize ='
@@ -235,38 +275,18 @@ sudo apt install libapache2-mod-php imagemagick ffmpeg php-bz2 php-redis redis-s
 # sudo iotop -o
 
 ----------------------------------------------------------------
-2. "Настроить SSH по ключу"
-# Сгенерировать ключ на локальной машине
-ssh-keygen -t rsa -b 4096 
-# создание папки ssh на удаленном сервере
-ssh [remote_username]@[server_ip_address] mkdir -p .ssh
-
-# экспорт публичного ключа на удаленный сервер (linux)
-cat ~/.ssh/id_rsa.pub | ssh [remote_username]@[server_ip_address] 'cat >> .ssh/authorized_keys' 
-
-# экспорт публичного ключа на удаленный сервер (windows)
-Get-Content .ssh/id_rsa.pub | ssh [remote_username]@[server_ip_address] 'cat >> .ssh/authorized_keys' 
-
-# отредактировать sshd_config
-sudo vim /etc/ssh/sshd_config 
-    Port 2322 # поменять порт SSH
-    UsePAM yes
-    PasswordAuthentication no
-    PermitRootLogin yes
-
-----------------------------------------------------------------
-3. "Добавить в 'trusted_domains' все адреса, к которым будет осуществляться подключение"
+2. "Добавить в 'trusted_domains' все адреса, к которым будет осуществляться подключение"
 sudo vim /var/www/nextcloud/config/config.php 
 
 'trusted_domains' =>
 array (
-    0 => '213.172.124.110',
+    0 => '212.172.124.110',
     1 => 'mycloud.ru',
     2 => '192.168.1.11',
 ),
 
 ----------------------------------------------------------------
-4. "Дополнительные настройки в nextcloud/config/config.php"
+3. "Дополнительные настройки в nextcloud/config/config.php"
 sudo vim /var/www/nextcloud/config/config.php
   'memcache.local' => '\\OC\\Memcache\\APCu',
   'default_phone_region' => 'RU',
@@ -276,14 +296,19 @@ sudo vim /var/www/nextcloud/config/config.php
   'maintenance' => false,
 
 ----------------------------------------------------------------
+4. "Удалить index.php из URL"
+sudo vim /var/www/nextcloud/config/config.php
+  'htaccess.RewriteBase' => '/',
+
+sudo php /var/www/nextcloud/occ maintenance:update:htaccess
+
+----------------------------------------------------------------
 5. "Убрать ошибку Image Magick error"
 sudo apt install libmagickcore-6.q16-6-extra
 
 ----------------------------------------------------------------
 6. "Настроить certbot"
 https://certbot.eff.org/instructions
-
-почта helpit@elcomspb.ru
 
 ----------------------------------------------------------------
 7. "Enabling Strict Transport Security"
@@ -452,14 +477,7 @@ sudo tail -n 100 /var/log/nextcloud.log
 sudo tail -n 100 /var/log/apache2/nextcloud.log
 
 ----------------------------------------------------------------
-14. "Удалить index.php из URL"
-sudo vim /var/www/nextcloud/config/config.php
-  'htaccess.RewriteBase' => '/',
-
-sudo php /var/www/nextcloud/occ maintenance:update:htaccess
-
-----------------------------------------------------------------
-15. "Настроить права доступа к nextcloud/config/config.php"
+14. "Настроить права доступа к nextcloud/config/config.php"
 sudo chmod 660 /var/www/nextcloud/config/config.php
 sudo chown root:www-data /var/www/nextcloud/config/config.php
 
