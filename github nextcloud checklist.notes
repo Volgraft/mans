@@ -9,12 +9,7 @@
     2G ext4 /boot
     %G root-vg (lvm)
         %G ext4 / root-lv (lvm)
-/dev/sdb
-    %G data-vg (lvm)
-        %G data-lv ext4 (lvm)
-/dev/sdc
-    %G backup-vg (lvm)
-        % backup-lv ext4 (lvm)
+
 
 ----------------------------------------------------------------
 3. "После установки извлечь установочный диск и перезагрузить"
