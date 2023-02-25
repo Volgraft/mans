@@ -1,5 +1,9 @@
-// 001. Настройка Ubuntu Server 
+//////////////////////////////////
+// 001. Настройка Ubuntu Server //
+//////////////////////////////////
+
 1. "Установить UbuntuServer" 
+----------------------------------------------------------------
 2. "При установке разметить диски"
 /dev/sda
     2G ext4 /boot
@@ -12,26 +16,32 @@
     %G backup-vg (lvm)
         % backup-lv ext4 (lvm)
 
+----------------------------------------------------------------
 3. "После установки извлечь установочный диск и перезагрузить"
 
+----------------------------------------------------------------
 4. "Обновить и очистить пакеты"
 sudo apt update
 sudo apt upgrade
 sudo apt autoremove
 
+----------------------------------------------------------------
 5. "Настроить hostname"
 sudo vim /etc/hostname
     cloud
 sudo vim /etc/hosts
     127.0.1.1 cloud
 
+----------------------------------------------------------------
 6. "Настроить timezone"
 sudo timedatectl set-timezone Europe/Moscow
 
+----------------------------------------------------------------
 7. "# make sure that “network: {config: disabled}” entry is there. If the entry is missing, we have to create it."
 sudo cat /etc/cloud/cloud.cfg.d/subiquity-disable-cloudinit-networking.cfg
     network: {config: disabled}
 
+----------------------------------------------------------------
 8. "Настроить сетевые интерфейсы"
 sudo cat /etc/netplan/00-installer-config.yaml
 sudo cp -a /etc/netplan/00-installer-config.yaml{,.orig}  # back up the file /etc/netplan/00-installer-config.yaml
@@ -58,11 +68,16 @@ network:
 
 sudo netplan try 
 
-// 002. Установка и настройка NextCloud (установка сервера, базы данных; монтирование директории data)
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 002. Установка и настройка NextCloud (установка сервера, базы данных; монтирование директории data) //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 1. "Установка и настройка базы данных"
 sudo apt install mariadb-server
 systemctl status mariadb
 
+----------------------------------------------------------------
 2. "Настройки безопасности MariaDB"
 sudo mysql_secure_installation
 
@@ -80,6 +95,7 @@ Remove test database and access to it? [Y/n]: y
 
 Reload privilege tables now? [Y/n]: y
 
+----------------------------------------------------------------
 3. "Создание базы nextcloud"
 sudo mariadb
   CREATE DATABASE nextcloud;
@@ -93,23 +109,28 @@ sudo mariadb
   # FLUSH PRIVILEGES;
   # exit
 
+----------------------------------------------------------------
 4. "Установка WEB сервера"
 sudo apt install php php-apcu php-bcmath php-cli php-common php-curl php-gd php-gmp php-imagick php-intl php-mbstring php-mysql php-zip php-xml
 systemctl status apache2 # apache2 должен установится как зависимость вместе с предыдущей командой
 
+----------------------------------------------------------------
 5."Enable PHP extensions"
 sudo phpenmod bcmath gmp imagick intl
 
+----------------------------------------------------------------
 6. "Скачать дистрибутив Nextcloud"
 https://nextcloud.com/
 wget https://download.nextcloud.com/server/releases/latest.zip
 
+----------------------------------------------------------------
 7. "Распаковать и установить Nextcloud"
 sudo apt install unzip
 unzip latest.zip
 sudo mv nextcloud /var/www/
 rm latest.zip
 
+----------------------------------------------------------------
 8. "Монтировать data-lv в /var/www/nextcloud/data/"
 sudo ls /var/www/nextcloud/data/ # убедится что директория не существует или пуста
 sudo mkdir /var/www/nextcloud/data/ # создать директорию
@@ -123,12 +144,15 @@ sudo vim /etc/fstab
 sudo mount -a
 lsblk # проверка корректности монтирования
 
+----------------------------------------------------------------
 9. "Сменить владельца /var/www/nextcloud/"
 sudo chown -R www-data:www-data /var/www/nextcloud/
 
+----------------------------------------------------------------
 10. "apache2 disable default site"
 sudo a2dissite 000-default.conf
 
+----------------------------------------------------------------
 11. "Настроить сайт nextcloud"
 sudo vim /etc/apache2/sites-available/nextcloud.conf
 
@@ -148,9 +172,11 @@ sudo vim /etc/apache2/sites-available/nextcloud.conf
 
 </VirtualHost>
 
+----------------------------------------------------------------
 12. "apache2 enable nextcloud site"
 sudo a2ensite nextcloud.conf
 
+----------------------------------------------------------------
 13. "Конфигурирование appache сервера"
 # провести проверку текущих настроек через cat
 cat /etc/php/8.1/apache2/php.ini | grep 'memory_limit = '
@@ -191,18 +217,24 @@ opcache.memory_consumption=128
 opcache.save_comments=1
 opcache.revalidate_freq=1
 
+----------------------------------------------------------------
 14. "Перепроверить модификаторы appache и перезагрузить appache"
 sudo a2enmod dir env headers mime rewrite ssl
 sudo systemctl restart apache2
 
+----------------------------------------------------------------
 15. "Перейти на сайт и завершить установку nextcloud"
 
-// 003. Дополнительные настройки и сервисы
+/////////////////////////////////////////////
+// 003. Дополнительные настройки и сервисы //
+/////////////////////////////////////////////
+
 1. "Дополнительный софт"
 sudo apt install libapache2-mod-php imagemagick ffmpeg php-bz2 php-redis redis-server unzip redis-server php-redis cron ncdu lnav net-tools iotop htop
 
 # sudo iotop -o
 
+----------------------------------------------------------------
 2. "Настроить SSH по ключу"
 # Сгенерировать ключ на локальной машине
 ssh-keygen -t rsa -b 4096 
@@ -222,6 +254,7 @@ sudo vim /etc/ssh/sshd_config
     PasswordAuthentication no
     PermitRootLogin yes
 
+----------------------------------------------------------------
 3. "Добавить в 'trusted_domains' все адреса, к которым будет осуществляться подключение"
 sudo vim /var/www/nextcloud/config/config.php 
 
@@ -232,6 +265,7 @@ array (
     2 => '192.168.1.11',
 ),
 
+----------------------------------------------------------------
 4. "Дополнительные настройки в nextcloud/config/config.php"
 sudo vim /var/www/nextcloud/config/config.php
   'memcache.local' => '\\OC\\Memcache\\APCu',
@@ -241,14 +275,17 @@ sudo vim /var/www/nextcloud/config/config.php
   'default_phone_region' => 'RU',
   'maintenance' => false,
 
+----------------------------------------------------------------
 5. "Убрать ошибку Image Magick error"
 sudo apt install libmagickcore-6.q16-6-extra
 
+----------------------------------------------------------------
 6. "Настроить certbot"
 https://certbot.eff.org/instructions
 
 почта helpit@elcomspb.ru
 
+----------------------------------------------------------------
 7. "Enabling Strict Transport Security"
 sudo vim /etc/apache2/sites-available/nextcloud-le-ssl.conf
 
@@ -260,6 +297,7 @@ sudo vim /etc/apache2/sites-available/nextcloud-le-ssl.conf
 </VirtualHost>
 </IfModule>
 
+----------------------------------------------------------------
 8. "Reditect to 443"
 sudo vim /etc/apache2/sites-available/nc-redir.conf
 
@@ -273,6 +311,7 @@ sudo vim /etc/apache2/sites-available/nc-redir.conf
 
 sudo systemctl restart apache2
 
+----------------------------------------------------------------
 9. "Настроить cron"
 
 
@@ -310,6 +349,7 @@ sudo vim /var/www/nextcloud/config/config.php
   ),
 
 
+----------------------------------------------------------------
 10. "Настроить fail2ban"
 sudo apt install fail2ban
 
@@ -365,6 +405,7 @@ sudo systemctl enable fail2ban
 sudo systemctl restart fail2ban
 sudo systemctl status fail2ban
 
+----------------------------------------------------------------
 11. "LDAP"
 
 sudo apt install php-ldap
@@ -386,11 +427,13 @@ sudo systemctl restart apache2
 - LDAP/AD Username: галочку
 - Other Attributes: nc, samaccountname
 
+----------------------------------------------------------------
 12. "ufw"
 sudo apt-get install ufw 
 sudo vim /etc/default/ufw 
   IPV6=yes
 
+----------------------------------------------------------------
 13. "Логи"
 sudo vim /var/www/nextcloud/config/config.php
   # в конец
@@ -408,12 +451,14 @@ sudo systemctl restart apache2
 sudo tail -n 100 /var/log/nextcloud.log
 sudo tail -n 100 /var/log/apache2/nextcloud.log
 
+----------------------------------------------------------------
 14. "Удалить index.php из URL"
 sudo vim /var/www/nextcloud/config/config.php
   'htaccess.RewriteBase' => '/',
 
 sudo php /var/www/nextcloud/occ maintenance:update:htaccess
 
+----------------------------------------------------------------
 15. "Настроить права доступа к nextcloud/config/config.php"
 sudo chmod 660 /var/www/nextcloud/config/config.php
 sudo chown root:www-data /var/www/nextcloud/config/config.php
