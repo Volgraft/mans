@@ -92,7 +92,7 @@ scp .\volgraft.ru.pub vol@188.120.225.8:/home/vol/.ssh/volgraft.ru.pub
 # подключится к удаленному серверу по ssh
 
 # экспорт публичного ключа в uthorized_keys
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys' 
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 # отредактировать sshd_config
 sudo vim /etc/ssh/sshd_config 
