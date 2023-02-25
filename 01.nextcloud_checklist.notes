@@ -275,7 +275,7 @@ sudo vim /var/www/nextcloud/config/config.php
 
 'trusted_domains' =>
 array (
-    0 => 'volgraft.ru',
+    0 => 'cloud.volgraft.ru',
 ),
 
 ----------------------------------------------------------------
@@ -355,7 +355,8 @@ sudo vim /var/www/nextcloud/config/config.php
   'memcache.distributed' => '\\OC\\Memcache\\Redis',
   'memcache.local' => '\\OC\\Memcache\\Redis',
   'memcache.locking' => '\\OC\\Memcache\\Redis',
-  'redis' => (
+  'redis' => 
+  array (
         'host' => '/var/run/redis/redis-server.sock',
         'port' => 0,
   ),
