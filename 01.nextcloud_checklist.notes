@@ -325,6 +325,8 @@ sudo systemctl restart apache2
 ----------------------------------------------------------------
 8. "Настроить cron"
 
+# Configuration settings > Basic settings > Enable Cron
+
 sudo apt install cron
 sudo systemctl enable cron
 
