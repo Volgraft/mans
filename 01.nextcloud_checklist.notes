@@ -426,6 +426,14 @@ sudo systemctl status fail2ban
 sudo apt-get install ufw 
 sudo vim /etc/default/ufw 
   IPV6=yes
+  
+sudo ufw default deny
+
+sudo ufw allow 22
+sudo ufw allow 80
+sudo ufw allow 443
+
+sudo ufw enable
 
 ----------------------------------------------------------------
 12. "Логи"
