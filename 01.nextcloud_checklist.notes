@@ -285,7 +285,6 @@ sudo vim /var/www/nextcloud/config/config.php
   'default_phone_region' => 'RU',
   'simpleSignUpLink.shown' => false,
   'config_is_read_only' => true,
-  'default_phone_region' => 'RU',
   'maintenance' => false,
 
 ----------------------------------------------------------------
