@@ -329,8 +329,6 @@ sudo systemctl restart apache2
 sudo apt install cron
 sudo systemctl enable cron
 
-sudo php /var/www/nextcloud/occ background:cron
-
 sudo crontab -e
   */5  *  *  *  * php -f /var/www/nextcloud/cron.php  # вставить в конце, не забыть про перенос на новую строку в конце
 sudo crontab -l
@@ -364,6 +362,7 @@ sudo vim /var/www/nextcloud/config/config.php
         'port' => 0,
   ),
 
+sudo php /var/www/nextcloud/occ background:cron
 
 ----------------------------------------------------------------
 10. "Настроить fail2ban"
