@@ -465,10 +465,154 @@ sudo php /var/www/nextcloud/occ maintenance:update:htaccess
 sudo chmod 660 /var/www/nextcloud/config/config.php
 sudo chown root:www-data /var/www/nextcloud/config/config.php
 
+//////////////////////////////
+// 004. Установка Collabora //
+//////////////////////////////
+
+0. Создать DNS запись
+Cоздать A запись collabora.volgraft.ru = IP вашего nextcloud
+
+----------------------------------------------------------------
+1. Установка
+В web интерфейсе установить приложение "Nextcloud Office"
+
+----------------------------------------------------------------
+2. Импорт ключа официального репозитория
+sudo apt install gnupg
+cd /usr/share/keyrings
+sudo wget https://collaboraoffice.com/downloads/gpg/collaboraonline-release-keyring.gpg
+
+----------------------------------------------------------------
+3. Добавить репозиторий
+sudo vim /etc/apt/sources.list.d/collaboraonline.sources
+
+Types: deb
+URIs: https://www.collaboraoffice.com/repos/CollaboraOnline/CODE-ubuntu2204
+Suites: ./
+Signed-By: /usr/share/keyrings/collaboraonline-release-keyring.gpg
+
+----------------------------------------------------------------
+4. Установить необходимые пакеты
+sudo apt update && sudo apt install coolwsd code-brand hunspell collaboraoffice*
+
+----------------------------------------------------------------
+5. Настройка Apache для Collabora
+
+sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/collabora.conf
+
+sudo vim /etc/apache2/sites-available/collabora.conf
+- настроить ServerName (collabora.volgraft.ru)
+- удалить ServerAdmin и DocumentRoot
+
+sudo a2ensite collabora && sudo systemctl reload apache2
+
+----------------------------------------------------------------
+6. Получить SSL сертификат с помощью certbot 
+sudo certbot --apache
+
+----------------------------------------------------------------
+7. Включить модули apache
+sudo a2enmod proxy proxy_wstunnel proxy_http proxy_connect
+
+----------------------------------------------------------------
+8. Настроить SSL конфиг Collabora на локальную работу
+
+sudo vim /etc/apache2/sites-enabled/collabora-le-ssl.conf
+
+        Options -Indexes
+
+        AllowEncodedSlashes NoDecode
+        ProxyPreserveHost On
+
+
+        # static html, js, images, etc. served from coolwsd
+        # browser is the client part of Collabora Online
+        ProxyPass           /browser http://127.0.0.1:9980/browser retry=0
+        ProxyPassReverse    /browser http://127.0.0.1:9980/browser
+
+
+        # WOPI discovery URL
+        ProxyPass           /hosting/discovery http://127.0.0.1:9980/hosting/discovery retry=0
+        ProxyPassReverse    /hosting/discovery http://127.0.0.1:9980/hosting/discovery
+
+
+        # Capabilities
+        ProxyPass           /hosting/capabilities http://127.0.0.1:9980/hosting/capabilities retry=0
+        ProxyPassReverse    /hosting/capabilities http://127.0.0.1:9980/hosting/capabilities
+
+
+        # Main websocket
+        ProxyPassMatch      "/cool/(.*)/ws$"      ws://127.0.0.1:9980/cool/$1/ws nocanon
+
+
+        # Admin Console websocket
+        ProxyPass           /cool/adminws ws://127.0.0.1:9980/cool/adminws
+
+
+        # Download as, Fullscreen presentation and Image upload operations
+        ProxyPass           /cool http://127.0.0.1:9980/cool
+        ProxyPassReverse    /cool http://127.0.0.1:9980/cool
+        # Compatibility with integrations that use the /lool/convert-to endpoint
+        ProxyPass           /lool http://127.0.0.1:9980/cool
+        ProxyPassReverse    /lool http://127.0.0.1:9980/cool
+
+
+        ErrorLog /var/log/apache2/collabora-error.log
+        CustomLog /var/log/apache2/collabora-access.log combined
+
+----------------------------------------------------------------
+9. Настройка файлов логов
+sudo touch /var/log/apache2/collabora-error.log
+sudo touch /var/log/apache2/collabora-access.log
+
+sudo chown root:cool /var/log/apache2/collabora-error.log
+sudo chown root:cool /var/log/apache2/collabora-access.log
+
+----------------------------------------------------------------
+10. Перезапустить apache
+sudo systemctl restart apache2
+
+----------------------------------------------------------------
+11. Настроить конфиг Collabora
+sudo vim /etc/coolwsd/coolwsd.xml
+  de_DE en_GB en_US es_ES fr_FR it nl pt_BR pt_PT ru 
+  > 
+  ru en_US
+
+
+sudo coolconfig set ssl.enable false
+sudo coolconfig set ssl.termination true
+
+----------------------------------------------------------------
+12. Перезапустить Collabora
+sudo systemctl restart coolwsd
+sudo systemctl status coolwsd
+
+----------------------------------------------------------------
+13. Включить Collabora в Nextcloud
+В WEB интерфейсе в настройках найти опцию Office и подключится к настроенному серверу https://collabora.volgraft.ru
+Заполнить опцию Allow list for WOPI requests , IP адресом collabora сервера
+
+Troubleshoot
+# https://sdk.collaboraonline.com/docs/installation/Collabora_Online_Troubleshooting_Guide.html
+journalctl -e -u coolwsd | lnav
+journalctl -r -u coolwsd | lnav
+
 ///////////////
 // ИСТОЧНИКИ //
 ///////////////
 
+- Установка и настройка Nextcloud
 # https://docs.nextcloud.com/server/latest/admin_manual/configuration_server
 # https://www.youtube.com/@LearnLinuxTV/videos
 # https://www.youtube.com/@NerdOnTheStreet/videos
+
+- Установка Collabora
+# Installation example on Ubuntu https://docs.nextcloud.com/server/latest/admin_manual/office/example-ubuntu.html
+# Reverse proxy https://docs.nextcloud.com/server/latest/admin_manual/office/proxy.html
+# Proxy settings https://sdk.collaboraonline.com/docs/installation/Proxy_settings.html
+# Setting up and configuring https://www.collaboraoffice.com/code/linux-packages/
+# Video https://nerdonthestreet.com/wiki?find=Install+Nextcloud+21%2C+Collabora%2C+and+HPB+on+Debian+10
+
+
+
