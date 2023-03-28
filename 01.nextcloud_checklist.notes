@@ -507,7 +507,7 @@ sudo a2ensite collabora && sudo systemctl reload apache2
 
 ----------------------------------------------------------------
 6. Получить SSL сертификат с помощью certbot 
-sudo certbot certonly -d cloud.volgraft.ru,collabora.volgraft.ru
+sudo certbot --apache
 
 ----------------------------------------------------------------
 7. Включить модули apache
