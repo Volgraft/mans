@@ -362,7 +362,7 @@ sudo vim /var/www/nextcloud/config/config.php
         'port' => 0,
   ),
 
-sudo php /var/www/nextcloud/occ background:cron
+sudo -u www-data php /var/www/nextcloud/occ background:cron
 
 ----------------------------------------------------------------
 10. "Настроить fail2ban"
