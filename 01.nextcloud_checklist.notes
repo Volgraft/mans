@@ -457,7 +457,7 @@ sudo tail -n 100 /var/log/apache2/nextcloud.log
 sudo vim /var/www/nextcloud/config/config.php
   'htaccess.RewriteBase' => '/',
 
-sudo php /var/www/nextcloud/occ maintenance:update:htaccess
+sudo -u www-data php /var/www/nextcloud/occ maintenance:update:htaccess
 
 ----------------------------------------------------------------
 14. "Настроить права доступа к nextcloud/config/config.php"
