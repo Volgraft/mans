@@ -91,37 +91,37 @@ sudo vim /etc/netplan/00-installer-config.yaml
 
 >network:
 > 
->   version: 2
+>  version: 2
 > 
->   renderer: networkd
+>  renderer: networkd
 > 
->   ethernets:
+>  ethernets:
 > 
->     ens18:
+>    ens18:
 > 
->       addresses:
+>      addresses:
 > 
->         - 192.168.1.11/24
+>        - 192.168.1.11/24
 > 
->       nameservers:
+>      nameservers:
 > 
->         addresses: [192.168.1.1, 8.8.8.8]
+>        addresses: [192.168.1.1, 8.8.8.8]
 > 
->     ens19:
+>    ens19:
 > 
->       addresses:
+>      addresses:
 > 
->         - 123.123.123.123/24
+>        - 123.123.123.123/24
 > 
->       nameservers:
+>      nameservers:
 > 
->         addresses: [8.8.8.8, 1.1.1.1]
+>        addresses: [8.8.8.8, 1.1.1.1]
 > 
->       routes:
+>      routes:
 > 
->         - to: default
+>        - to: default
 > 
->           via: 123.123.123.1
+>          via: 123.123.123.1
 
 
 Применить изменения (если в конфиге вы сменили IP, следующую команду необходимо выполнить залогинившись непосредственно в консоль сервера, а **не** по SSH и т.п.)
