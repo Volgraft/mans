@@ -432,6 +432,9 @@ opcache.revalidate_freq=1*
 
 ```
 sudo a2enmod dir env headers mime rewrite ssl
+```
+
+```
 sudo systemctl restart apache2
 ```
 
