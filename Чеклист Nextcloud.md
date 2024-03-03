@@ -89,7 +89,7 @@ ip a | grep -E "inet |<.*>"
 sudo vim /etc/netplan/00-installer-config.yaml
 ```
 
-> network:
+>network:
 > 
 >   version: 2
 > 
