@@ -89,25 +89,40 @@ ip a | grep -E "inet |<.*>"
 sudo vim /etc/netplan/00-installer-config.yaml
 ```
 
-'''
 > network:
+> 
 >   version: 2
+> 
 >   renderer: networkd
+> 
 >   ethernets:
+> 
 >     ens18:
+> 
 >       addresses:
+> 
 >         - 192.168.1.11/24
+> 
 >       nameservers:
+> 
 >         addresses: [192.168.1.1, 8.8.8.8]
+> 
 >     ens19:
+> 
 >       addresses:
+> 
 >         - 123.123.123.123/24
+> 
 >       nameservers:
+> 
 >         addresses: [8.8.8.8, 1.1.1.1]
+> 
 >       routes:
+> 
 >         - to: default
+> 
 >           via: 123.123.123.1
-'''
+
 
 Применить изменения (если в конфиге вы сменили IP, следующую команду необходимо выполнить залогинившись непосредственно в консоль сервера, а **не** по SSH и т.п.)
 
