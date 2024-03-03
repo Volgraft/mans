@@ -89,7 +89,7 @@ ip a | grep -E "inet |<.*>"
 sudo vim /etc/netplan/00-installer-config.yaml
 ```
 
-
+> В текст ниже подставьте свой ip адрес, шлюз и DNS cehdth
 ```
 network:
   version: 2
