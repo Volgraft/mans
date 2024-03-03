@@ -98,12 +98,12 @@ sudo vim /etc/netplan/00-installer-config.yaml
        addresses:
          - 192.168.1.11/24
        nameservers:
-         addresses: \[192.168.1.1, 8.8.8.8\]
+         addresses: [192.168.1.1, 8.8.8.8]
      ens19:
        addresses:
          - 123.123.123.123/24
        nameservers:
-         addresses: \[8.8.8.8, 1.1.1.1\]
+         addresses: [8.8.8.8, 1.1.1.1]
        routes:
          - to: default
            via: 123.123.123.1
