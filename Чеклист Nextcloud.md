@@ -71,9 +71,9 @@ sudo timedatectl set-timezone Europe/Moscow
 sudo cat /etc/cloud/cloud.cfg.d/subiquity-disable-cloudinit-networking.cfg 
 ```
 
-Команда даолжна вывести следующую строку: *network: {config: disabled}*
+Команда должна вывести следующую строку: *network: {config: disabled}*
 
-Если данная скрока не была выведена, следует добавить её в файл */etc/cloud/cloud.cfg.d/subiquity-disable-cloudinit-networking.cfg*
+Если данная строка не была выведена, следует добавить её в файл */etc/cloud/cloud.cfg.d/subiquity-disable-cloudinit-networking.cfg*
 
 Получить информацию о текущем состоянии сетевых интерфейсов и сделать бекап конфига
 
