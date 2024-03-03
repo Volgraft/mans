@@ -347,21 +347,21 @@ sudo a2dissite 000-default.conf
 sudo vim /etc/apache2/sites-available/nextcloud.conf
 ```
 
-> <VirtualHost \*:80>  
->     DocumentRoot "/var/www/nextcloud"  
->     ServerName cloud  
->   
->     <Directory "/var/www/nextcloud/">  
->         Options MultiViews FollowSymlinks  
->         AllowOverride All  
->         Order allow,deny  
->         Allow from all  
->    </Directory>  
->   
->    TransferLog /var/log/apache2/nextcloud.log  
->    ErrorLog /var/log/apache2/nextcloud.log  
->   
-> </VirtualHost>
+<VirtualHost \*:80>  
+    DocumentRoot "/var/www/nextcloud"  
+    ServerName cloud  
+  
+    <Directory "/var/www/nextcloud/">  
+        Options MultiViews FollowSymlinks  
+        AllowOverride All  
+        Order allow,deny  
+        Allow from all  
+   </Directory>  
+  
+   TransferLog /var/log/apache2/nextcloud.log  
+   ErrorLog /var/log/apache2/nextcloud.log  
+   
+</VirtualHost>
 
 #### 11\. Включить nextcloud сайт в apache
 
