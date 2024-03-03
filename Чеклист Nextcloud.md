@@ -276,7 +276,7 @@ sudo mariadb
 ```
 CREATE DATABASE nextcloud;
 SHOW DATABASES;
-GRANT ALL PRIVILEGES ON nextcloud.\* TO 'nextcloud'@'localhost' IDENTIFIED BY 'mypassword';
+GRANT ALL PRIVILEGES ON nextcloud.* TO 'nextcloud'@'localhost' IDENTIFIED BY 'mypassword';
 FLUSH PRIVILEGES;
 exit
 ```
