@@ -89,7 +89,7 @@ ip a | grep -E "inet |<.*>"
 sudo vim /etc/netplan/00-installer-config.yaml
 ```
 
-
+'''
 > network:
 >   version: 2
 >   renderer: networkd
@@ -107,7 +107,7 @@ sudo vim /etc/netplan/00-installer-config.yaml
 >       routes:
 >         - to: default
 >           via: 123.123.123.1
-
+'''
 
 Применить изменения (если в конфиге вы сменили IP, следующую команду необходимо выполнить залогинившись непосредственно в консоль сервера, а **не** по SSH и т.п.)
 
