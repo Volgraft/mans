@@ -273,17 +273,21 @@ sudo mysql_secure_installation
 sudo mariadb
 ```
 
-> CREATE DATABASE nextcloud;
-> SHOW DATABASES;
-> GRANT ALL PRIVILEGES ON nextcloud.\* TO 'nextcloud'@'localhost' IDENTIFIED BY 'mypassword';
-> FLUSH PRIVILEGES;
-> exit
+```
+CREATE DATABASE nextcloud;
+SHOW DATABASES;
+GRANT ALL PRIVILEGES ON nextcloud.\* TO 'nextcloud'@'localhost' IDENTIFIED BY 'mypassword';
+FLUSH PRIVILEGES;
+exit
+```
 
 сменить пароль пользователя в maiadb (если забыли сменить)
 
-> ALTER USER 'nextcloud'@'localhost' IDENTIFIED BY 'new_password';
-> FLUSH PRIVILEGES;
-> exit
+```
+ALTER USER 'nextcloud'@'localhost' IDENTIFIED BY 'new_password';
+FLUSH PRIVILEGES;
+exit
+```
 
 #### 4\. Установка WEB сервера
 
