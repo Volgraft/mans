@@ -467,11 +467,11 @@ sudo vim /var/www/nextcloud/config/config.php
 sudo vim /var/www/nextcloud/config/config.php
 ```
 
->   'memcache.local' => '\\\\OC\\\\Memcache\\\\APCu',  
->   'default_phone_region' => 'RU',  
->   'simpleSignUpLink.shown' => false,  
->   'config_is_read_only' => true,  
->   'maintenance' => false,
+>     'memcache.local' => '\\\\OC\\\\Memcache\\\\APCu',  
+>     'default_phone_region' => 'RU',  
+>     'simpleSignUpLink.shown' => false,  
+>     'config_is_read_only' => true,  
+>     'maintenance' => false,
 
 #### 4\. Убрать ошибку "Image Magick error"
 
