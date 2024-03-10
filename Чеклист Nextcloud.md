@@ -467,7 +467,7 @@ sudo vim /var/www/nextcloud/config/config.php
 sudo vim /var/www/nextcloud/config/config.php
 ```
 
->     'memcache.local' => '\\\\OC\\\\Memcache\\\\APCu',  
+>     'memcache.local' => '\\OC\\Memcache\\APCu',  
 >     'default_phone_region' => 'RU',  
 >     'simpleSignUpLink.shown' => false,  
 >     'config_is_read_only' => true,  
@@ -582,19 +582,19 @@ sudo vim /var/www/nextcloud/config/config.php
 
  удалить строку    
 
-> 'memcache.local' => '\\\\OC\\\\Memcache\\\\APCu',
+>     'memcache.local' => '\\OC\\Memcache\\APCu',
 
 добавить строки
 
->   'filelocking.enabled' => true,  
->   'memcache.distributed' => '\\\\OC\\\\Memcache\\\\Redis',  
->   'memcache.local' => '\\\\OC\\\\Memcache\\\\Redis',  
->   'memcache.locking' => '\\\\OC\\\\Memcache\\\\Redis',  
->   'redis' =>   
->   array (  
->         'host' => '/var/run/redis/redis-server.sock',  
->         'port' => 0,  
->   ),
+>     'filelocking.enabled' => true,  
+>     'memcache.distributed' => '\\OC\\Memcache\\Redis',  
+>     'memcache.local' => '\\OC\\Memcache\\Redis',  
+>     'memcache.locking' => '\\OC\\Memcache\\Redis',  
+>     'redis' =>   
+>     array (  
+>           'host' => '/var/run/redis/redis-server.sock',  
+>           'port' => 0,  
+>     ),
 
 #### 10\. Настроить fail2ban
 
