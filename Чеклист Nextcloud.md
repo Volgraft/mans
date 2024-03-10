@@ -348,7 +348,7 @@ sudo vim /etc/apache2/sites-available/nextcloud.conf
 ```
 
 ```
-<VirtualHost \*:80>  
+<VirtualHost *:80>  
     DocumentRoot "/var/www/nextcloud"  
     ServerName cloud  
   
