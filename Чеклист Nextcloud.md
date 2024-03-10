@@ -497,13 +497,13 @@ sudo vim /etc/apache2/sites-available/nextcloud-le-ssl.conf
 
 добавить **выделенную** строку 
 
-> <IfModule mod_ssl.c>  
-> <VirtualHost \*:443>  
->   ............  
->   **Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"**   
->   ............  
-> </VirtualHost>  
-> </IfModule>
+>   <IfModule mod_ssl.c>  
+>   <VirtualHost \*:443>  
+>     ............  
+>     **Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"**   
+>     ............  
+>   </VirtualHost>  
+>   </IfModule>
 
 #### 7\. Перенаправляем запросы с 80 порта на 443
 
@@ -511,13 +511,13 @@ sudo vim /etc/apache2/sites-available/nextcloud-le-ssl.conf
 sudo vim /etc/apache2/sites-available/nc-redir.conf 
 ```
 
-> <VirtualHost \*:80>  
->    ServerName nc.domain.org
+>   <VirtualHost \*:80>  
+>      ServerName nc.domain.org
 >
->    RewriteEngine On  
->    RewriteCond %{HTTPS} off  
->    RewriteRule ^(.\*)$ https://%{HTTP_HOST}$1 \[R=301,L\]  
-> </VirtualHost>
+>      RewriteEngine On  
+>      RewriteCond %{HTTPS} off  
+>      RewriteRule ^(.\*)$ https://%{HTTP_HOST}$1 \[R=301,L\]  
+>   </VirtualHost>
 
 ```
 sudo systemctl restart apache2
