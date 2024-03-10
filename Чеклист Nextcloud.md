@@ -501,7 +501,7 @@ sudo vim /etc/apache2/sites-available/nextcloud-le-ssl.conf
 <IfModule mod_ssl.c>  
 <VirtualHost \*:443>  
 ............  
-**Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"**   
+Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"
 ............  
 </VirtualHost>  
 </IfModule>
