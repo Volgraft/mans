@@ -497,13 +497,15 @@ sudo vim /etc/apache2/sites-available/nextcloud-le-ssl.conf
 
 добавить **выделенную** строку 
 
->   <IfModule mod_ssl.c>  
->   <VirtualHost \*:443>  
->     ............  
->     **Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"**   
->     ............  
->   </VirtualHost>  
->   </IfModule>
+```
+<IfModule mod_ssl.c>  
+<VirtualHost \*:443>  
+............  
+**Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains"**   
+............  
+</VirtualHost>  
+</IfModule>
+```
 
 #### 7\. Перенаправляем запросы с 80 порта на 443
 
