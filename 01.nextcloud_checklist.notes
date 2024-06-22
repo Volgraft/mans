@@ -235,7 +235,7 @@ sudo sed -i 's/max_execution_time = 30/max_execution_time = 360/g' /etc/php/8.1/
 sudo sed -i 's/post_max_size = 8M/post_max_size = 200M/g' /etc/php/8.1/apache2/php.ini
 sudo sed -i 's/;date.timezone =/date.timezone = Europe\/Moscow/g' /etc/php/8.1/apache2/php.ini
 sudo sed -i 's/;opcache.enable=1/opcache.enable=1/g' /etc/php/8.1/apache2/php.ini
-sudo sed -i 's/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=8/g' /etc/php/8.1/apache2/php.ini
+sudo sed -i 's/;opcache.interned_strings_buffer=8/opcache.interned_strings_buffer=16/g' /etc/php/8.1/apache2/php.ini
 sudo sed -i 's/;opcache.max_accelerated_files=10000/opcache.max_accelerated_files=10000/g' /etc/php/8.1/apache2/php.ini
 sudo sed -i 's/;opcache.memory_consumption=128/opcache.memory_consumption=128/g' /etc/php/8.1/apache2/php.ini
 sudo sed -i 's/;opcache.save_comments=1/opcache.save_comments=1/g' /etc/php/8.1/apache2/php.ini
@@ -248,7 +248,7 @@ max_execution_time = 360
 post_max_size = 200M
 date.timezone = Europe/Moscow
 opcache.enable=1
-opcache.interned_strings_buffer=8
+opcache.interned_strings_buffer=16
 opcache.max_accelerated_files=10000
 opcache.memory_consumption=128
 opcache.save_comments=1
@@ -286,6 +286,7 @@ sudo vim /var/www/nextcloud/config/config.php
   'simpleSignUpLink.shown' => false,
   'config_is_read_only' => true,
   'maintenance' => false,
+  'maintenance_window_start' => 1,
 
 ----------------------------------------------------------------
 4. "Убрать ошибку Image Magick error"
