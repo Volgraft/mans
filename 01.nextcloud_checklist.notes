@@ -330,9 +330,9 @@ sudo systemctl restart apache2
 sudo apt install cron
 sudo systemctl enable cron
 
-sudo crontab -e
+sudo -u www-data crontab -e
   */5  *  *  *  * php -f /var/www/nextcloud/cron.php  # вставить в конце, не забыть про перенос на новую строку в конце
-sudo crontab -l
+sudo -u www-data crontab -l
 
 ----------------------------------------------------------------
 9. "Настроить redis"
