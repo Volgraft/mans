@@ -2,21 +2,21 @@
 
 ## Nextcloud install
 
-#### Установить UbuntuServer 
+### Установить UbuntuServer 
 Инструкция предназначена для версии 24.04 но 
 
-#### Обновить и очистить пакеты
+### Обновить и очистить пакеты
 ```bash
 sudo apt update && sudo apt upgrade -y && sudo apt autoremove
 ```
 
-#### Настроить hostname и добавим имя в hosts файл _(в данном примере "cloud")_
+### Настроить hostname и добавим имя в hosts файл _(в данном примере "cloud")_
 ```bash
 echo "cloud" > /etc/hostname
 sudo sed -i 's/^127\\.0\\.1\\.1.\*/127.0.1.1 cloud/g' /etc/hosts
 ```
 
-#### Настроим timezone (вот несколько на выбор)
+### Настроим timezone (вот несколько на выбор)
 ```
 sudo timedatectl set-timezone Europe/Moscow
 sudo timedatectl set-timezone Europe/Kyiv
@@ -24,7 +24,7 @@ sudo timedatectl set-timezone Europe/Minsk
 sudo timedatectl set-timezone Asia/Almaty
 ```
 
-#### Настроить сетевые интерфейсы
+### Настроить сетевые интерфейсы
 Делаем бекап конфига
 ```bash
 sudo cp -a /etc/netplan/50-cloud-init.yaml{,.orig}
@@ -67,15 +67,15 @@ sudo netplan apply
 192.168.1.100 cloud.mydom.com collabora.mydom.com
 ```
 
-#### Создаем и настраиваем пользователя
+### Создаем и настраиваем пользователя
 ```bash
 sudo adduser vol
 usermod -aG sudo vol
 usermod -aG www-data vol
 ```
 
-#### Настраиваем ssh по ключу
-##### Если у вас windows установить openssh командой
+### Настраиваем ssh по ключу
+#### Если у вас windows установить openssh командой
 Установить openssh командой
 ```powershell
 winget install openssh
@@ -98,7 +98,7 @@ Get-Service -Name ssh-agent | Set-Service -StartupType Automatic
 Get-Service ssh-agent | Select Name, Status, StartType, DisplayName
 ```
 
-##### Если у вас Linux устанавливаем openssh командой
+#### Если у вас Linux устанавливаем openssh командой
 ```bash
 sudo apt install openssh
 ```
@@ -111,7 +111,7 @@ sudo systemctl enable ssh --now
 sudo systemctl status ssh
 ```
 
-##### далее инструкция подходит и для windows и для linux
+#### далее инструкция подходит и для windows и для linux
 Создаем папку .ssh и переходим в неё
 ```
 mkdir ~/.ssh
@@ -157,12 +157,12 @@ ssh vol@12.34.56.100
 ```
 Если запрашивает пароль, то что-то не так, возможно дело в правах на authorized_keys. Права на на сервере на директорию .ssh и файл authorized_keys должны быть "600"
 
-#### Создаем доменную запись
+### Создаем доменную запись
 Необходимо создать доменную "A" запись на доменном хостинге который вы приобрели или на локальном доменном сервере если не планируете использовать https. В данной инструкции это будет **cloud.mydomain.com**
 
 https://www.google.com/search?q=купить+домен
 
-#### Установка и настройка базы данных
+### Установка и настройка базы данных
 Устанавливаем mariadb-server
 ```bash
 sudo apt install mariadb-server -y && systemctl status mariadb
@@ -172,7 +172,7 @@ sudo apt install mariadb-server -y && systemctl status mariadb
 sudo apt install mariadb-client -y
 ```
 
-#### Настройки безопасности MariaDB
+### Настройки безопасности MariaDB
 Ubuntu 24.04
 ```bash
 sudo mysql_secure_installation
@@ -190,7 +190,7 @@ sudo mariadb-secure-installation
 - Remove test database and access to it? [Y/n]: y
 - Reload privilege tables now? [Y/n]: y
 
-#### Настройки конфига MariaDB
+### Настройки конфига MariaDB
 Открываем файл конфига mariadb
 ```bash
 sudo vim /etc/mysql/my.cnf
@@ -225,7 +225,7 @@ sudo touch /var/log/mysql/slow.log
 sudo chown -R mysql:mysql /var/log/mysql
 ```
 
-#### Создание базы nextcloud
+### Создание базы nextcloud
 Заходим в базу mariadb
 ```bash
 sudo mariadb
@@ -255,7 +255,7 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-#### Установка WEB сервера
+### Установка WEB сервера
 Устанавливаем необходимые пакеты
 ```bash
 sudo apt install vim php php-apcu php-bcmath php-cli php-common php-curl php-gd php-gmp php-imagick php-intl php-mbstring php-mysql php-zip php-xml -y 
@@ -265,12 +265,12 @@ sudo apt install vim php php-apcu php-bcmath php-cli php-common php-curl php-gd 
 sudo systemctl status apache2
 ```
 
-#### Активируем PHP расширения
+### Активируем PHP расширения
 ```bash
 sudo phpenmod bcmath gmp imagick intl
 ```
 
-#### Скачиваем пакет nextcloud
+### Скачиваем пакет nextcloud
 Последнюю версию
 ```bash
 wget https://download.nextcloud.com/server/releases/latest.zip
@@ -284,7 +284,7 @@ https://download.nextcloud.com/server/releases/nextcloud-31.0.7.zip
 mv nextcloud-31.0.7.zip latest.zip
 ```
 
-#### Установка nextcloud
+### Установка nextcloud
 Установить unzip если не установлен
 ```bash
 sudo apt install unzip
@@ -299,7 +299,7 @@ sudo mv nextcloud /var/www/
 rm latest.zip
 ```
 
-#### Редактируем права и владельца всей директории nextcloud
+### Редактируем права и владельца всей директории nextcloud
 Смена владельца на пользователя www-data и группу www-data (в которую мы ранее для удобства добавили нашего пользователя)
 ```bash
 sudo chown -R www-data:www-data /var/www/nextcloud/
@@ -313,12 +313,12 @@ find /var/www/nextcloud/ -type d -exec chmod 750 {} \;
 find /var/www/nextcloud/ -type f -exec chmod 640 {} \;
 ```
 
-#### Отключаем дефолтный apache сайт
+### Отключаем дефолтный apache сайт
 ```bash
 sudo a2dissite 000-default.conf
 ```
 
-#### Настроиваем сайт nextcloud
+### Настроиваем сайт nextcloud
 ```bash
 sudo vim /etc/apache2/sites-available/nextcloud.conf
 ```
@@ -340,13 +340,13 @@ sudo vim /etc/apache2/sites-available/nextcloud.conf
 </VirtualHost>
 ```
 
-#### Активируем сайт nextcloud
+### Активируем сайт nextcloud
 ```bash
 sudo a2ensite nextcloud.conf
 ```
 
-#### Правим конфиг apache
-##### Ubuntu 24.04
+### Правим конфиг apache
+#### Ubuntu 24.04
 Смотрим текущие параметры важных настроек
 ```bash
 cat /etc/php/8.3/apache2/php.ini | grep 'memory_limit = '
@@ -397,7 +397,7 @@ opcache.save_comments=1
 opcache.revalidate_freq=1
 ```
 
-##### Ubuntu 25.04
+#### Ubuntu 25.04
 Смотрим текущие параметры важных настроек
 ```bash
 cat /etc/php/8.4/apache2/php.ini | grep 'memory_limit = '
@@ -448,23 +448,23 @@ opcache.save_comments=1
 opcache.revalidate_freq=1
 ```
 
-#### Перезапускаем apache
+### Перезапускаем apache
 Ещё раз убеждаемся что модификаторы apache включены и исправны и перезапускаем apache
 ```bash
 sudo a2enmod dir env headers mime rewrite ssl
 sudo systemctl restart apache2
 ```
 
-#### Переходим на сайт и завершаем первичную установку
+### Переходим на сайт и завершаем первичную установку
 http://12.34.56.100
 
-#### Устанавливаем дополнительный софт
+### Устанавливаем дополнительный софт
 Здесь собран софт для функционирования nextcloud, популярных nextcloud плагинов и базового дебага linux
 ```bash
 sudo apt install libapache2-mod-php imagemagick ffmpeg php-bz2 php-redis redis-server redis-server php-redis cron ncdu lnav net-tools iotop htop snap -y
 ```
 
-#### Правим trusted_domains и overwrite.cli.url
+### Правим trusted_domains и overwrite.cli.url
 ```bash
 sudo vim /var/www/nextcloud/config/config.php
 ```
@@ -477,7 +477,7 @@ sudo vim /var/www/nextcloud/config/config.php
 'overwrite.cli.url' => 'https://cloud.mydomain.com',
 ```
 
-#### Дополнительные настройки
+### Дополнительные настройки
 Добавляем эти параметры в конфиг
 ```bash
 sudo vim /var/www/nextcloud/config/config.php
@@ -492,7 +492,7 @@ sudo vim /var/www/nextcloud/config/config.php
   'memcache.local' => '\\OC\\Memcache\\APCu',
 ```
 
-#### Делаем url ссылок короче
+### Делаем url ссылок короче
 ```bash
 sudo vim /var/www/nextcloud/config/config.php
 ```
@@ -505,7 +505,7 @@ sudo vim /var/www/nextcloud/config/config.php
 sudo php /var/www/nextcloud/occ maintenance:update:htaccess
 ```
 
-#### Убираем ошибку Image Magick error
+### Убираем ошибку Image Magick error
 ```bash
 sudo apt install libmagickcore-7.q16-10-extra
 ```
@@ -514,8 +514,8 @@ sudo apt install libmagickcore-7.q16-10-extra
 sudo apt install --simulate libmagickcore-
 ```
 
-#### Настроить сертификат
-##### Настройка через certbot
+### Настроить сертификат
+#### Настройка через certbot
 Действуем по инструкции для apache через snap с сайта
 https://certbot.eff.org/instructions
 
@@ -530,7 +530,7 @@ https://certbot.eff.org/instructions
 </IfModule>
 ```
 
-##### Настройка вручную
+#### Настройка вручную
 На сервере создаем директорию ssl
 ```bash
 sudo mkdir /etc/apache2/ssl
@@ -588,7 +588,7 @@ sudo a2ensite nextcloud-ssl.conf
 sudo systemctl reload apache2
 ```
 
-#### Редирект с 80 порта на 443 порт
+### Редирект с 80 порта на 443 порт
 Создаем конфиг
 ```bash
 sudo vim /etc/apache2/sites-available/nc-redir.conf
@@ -607,7 +607,7 @@ sudo vim /etc/apache2/sites-available/nc-redir.conf
 sudo systemctl restart apache2
 ```
 
-#### Настрока cron
+### Настрока cron
 Файл cron это основной файл отвечающий за автоматизацию всех процессов: атоматические операции с файлами, корзиной, базой данных и т.п. 
 **Когда в /var/www/nextcloud/config/config.php стоит 'maintenance' => true, cron файл пропускает выполнение по расписанию.**
 
@@ -634,7 +634,7 @@ _Рекомендуется ставить перенос строки в кон
 sudo -u www-data crontab -l
 ```
 
-#### Настраиваем Redis
+### Настраиваем Redis
 Redis — это хранящаяся в оперативной памяти  база данных которая работает как очень быстрая «временная память», которуя используется для кеша и очередей.
 В Nextcloud Redis нужен, чтобы хранить сессии пользователей и кешировать разные данные. Так сайт работает быстрее, а одновременные запросы обрабатываются без заметных задержек и конфликтов.
 
@@ -684,7 +684,7 @@ sudo vim /var/www/nextcloud/config/config.php
   ),
 ```
 
-#### Настраиваем fail2ban
+### Настраиваем fail2ban
 Устанавливаем fail2ban
 ```bash
 sudo apt install fail2ban
@@ -756,7 +756,7 @@ sudo chmod 660 /var/log/nextcloud.log
 sudo systemctl enable fail2ban && sudo systemctl restart fail2ban && sudo systemctl status fail2ban
 ```
 
-#### Настраиваем базовый ufw фаервол
+### Настраиваем базовый ufw фаервол
 Устанавливаем ufw
 ```bash
 sudo apt-get install ufw 
@@ -793,7 +793,7 @@ sudo ufw delete <номер>
 sudo ufw insert 1 allow from 8.8.8.8 to any
 ```
 
-#### Настройка логов
+### Настройка логов
 Добавляем необходимые строки в конфиг
 ```bash
 sudo vim /var/www/nextcloud/config/config.php
@@ -816,7 +816,7 @@ sudo tail -n 100 /var/log/nextcloud.log | lnav
 sudo tail -n 100 /var/log/apache2/nextcloud.log | lnav
 ```
 
-#### Skeleton directory
+### Skeleton directory
 Когда создается новый пользователь, у него в nextcloud уже есть некоторый набор файлов. Они копируются из Skeleton directory по умолчанию. Если хотите настроить свой набор файлов по умолчанию или чтобы их вообще не было - нужно настроить свою Skeleton directory. **Внимание, не редактируте ничего в Skeleton directory по умолчанию т.к. неминуемо встретите проблемы при обновлении.**
 
 Создаем директорию под Skeleton directory
@@ -832,7 +832,7 @@ sudo vim /var/www/nextcloud/config/config.php
   'skeletondirectory' => '/opt/nextcloud_skeleton',
 ```
 
-#### Настройка автоматической очистки корзины
+### Настройка автоматической очистки корзины
 По умолчанию в nextcloud под когзину отводится половина свободного места, выделенного пользователю и автоматическое удаление самых старых удаленных файлов при нехватке места. При таком раскладе если вы единовременно загружаете файлы общим объемом больше половины свободного места то параллельно в загрузкой начинает происходить удаление что может замедлить процесс загрузки и нагрузить сервер. Так же это может значительно увеличивать размер бекапов.
 
 Чтобы настроить автоматическую очистку корзины от файлов, удаленных более 30 дней назад, добавьте в конфиг эту строку:
@@ -843,14 +843,14 @@ sudo vim /var/www/nextcloud/config/config.php
   'trashbin_retention_obligation' => 'auto, 30',
 ```
 
-#### Починка индексов в базе
+### Починка индексов в базе
 Иногда после установки или обновления требуется починить индексы в базе данных
 ```bash
 sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
 sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
 ```
 
-#### Увеличить лимит памяти
+### Увеличить лимит памяти
 Если ранее в конфиге /etc/php/8.*/apache2/php.ini вы установили memory_limit = 2048M то нужно добавить строку в конфиг. Это необходимо например для корректного отборажения превью крупных изображений в приложении Memories.
 ```bash
 sudo vim  /var/www/nextcloud/config/config.php
@@ -861,14 +861,14 @@ sudo vim  /var/www/nextcloud/config/config.php
 
 ## Collabora install
 
-#### Создать dns запись
+### Создать dns запись
 Создаем доменную "A" запись на том-же хостинге где делали cloud.mydomain.com
 В данном примере это будет **collabora.mydomain.com**
 
-#### Установка Nextcloud Office
+### Установка Nextcloud Office
 В web интерефейсе идем в Apps и устнавливаем там приложение "Nextcloud Office"
 
-#### Импорт ключа официального репозитория
+### Импорт ключа официального репозитория
 Установим gnupg
 ```bash
 sudo apt install gnupg
@@ -879,7 +879,7 @@ cd /usr/share/keyrings
 sudo wget https://collaboraoffice.com/downloads/gpg/collaboraonline-release-keyring.gpg
 ```
 
-#### Добавим репозиторий в /etc/apt/sources.list.d
+### Добавим репозиторий в /etc/apt/sources.list.d
 ```bash
 sudo cat << EOF > /etc/apt/sources.list.d/collaboraonline.sources
 Types: deb
@@ -889,12 +889,12 @@ Signed-By: /usr/share/keyrings/collaboraonline-release-keyring.gpg
 EOF
 ```
 
-#### Установка Collabora
+### Установка Collabora
 ```bash
 sudo apt update && sudo apt install coolwsd collabora-online-brand
 ```
 
-#### Настройка Apache для Collabora
+### Настройка Apache для Collabora
 Создаем шаблон конфига
 ```bash
 sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/collabora.conf
@@ -916,13 +916,13 @@ sudo vim /etc/apache2/sites-available/collabora.conf
 sudo a2ensite collabora && sudo systemctl reload apache2
 ```
 
-#### Включаем модули apache
+### Включаем модули apache
 ```bash
 sudo a2enmod proxy proxy_wstunnel proxy_http proxy_connect
 ```
 
-#### Получить SSL сертификат
-##### Через certbot
+### Получить SSL сертификат
+#### Через certbot
 Используем команду certbot
 ```bash
 sudo certbot --apache
@@ -974,7 +974,7 @@ sudo vim /etc/apache2/sites-enabled/collabora-le-ssl.conf
         CustomLog /var/log/apache2/collabora-access.log combined
 ```
 
-##### Настройка сертификатов вручную
+#### Настройка сертификатов вручную
 Создаем конфиг файл. В данной инструкции предполагается что у вас сертификаты подходят на весь домен (*.mydoamin.com). Если у вас отдельные ключ и сертификат для collabora, вам необходимо подгрузить их на сервер и ипоменять к ним пути в конфиге ниже и выдать права как и у сертификатов cloud.
 ```bash
 sudo vim /etc/apache2/sites-available/collabora-ssl.conf
@@ -1041,7 +1041,7 @@ sudo vim /etc/apache2/sites-enabled/collabora-le-ssl.conf
 sudo a2ensite collabora-ssl.conf
 ```
 
-##### Для обоих вариантов
+#### Для обоих вариантов
 Добавим в этот файл редирект на пустую страницу чтобы не отобразалась стартовая страниц apache при входе на сайт
 ```bash
 sudo vim /etc/apache2/sites-enabled/collabora-le-ssl.conf
@@ -1058,7 +1058,7 @@ sudo a2enmod ssl
 sudo systemctl reload apache2
 ```
 
-#### Настройка логов
+### Настройка логов
 Создадим файлы логов
 ```bash
 sudo touch /var/log/apache2/collabora-error.log
@@ -1070,7 +1070,7 @@ sudo chown root:cool /var/log/apache2/collabora-error.log
 sudo chown root:cool /var/log/apache2/collabora-access.log
 ```
 
-#### Настроить конфиг collabora
+### Настроить конфиг collabora
 В Collabora языки используются для оформления интерфейса collabora и для проверки орфографии. В больших текстовых файлах проверка орфографии большого кол-ва языков может замедлять производительность. Рекомендуется оставить только нужные языки.
 
 Посметреть какие языки сейчас в конфиге
@@ -1091,7 +1091,7 @@ sudo coolconfig set ssl.enable false
 sudo coolconfig set ssl.termination true
 ```
 
-#### Перезапускаем collabora и apache
+### Перезапускаем collabora и apache
 ```bash
 sudo systemctl restart apache2
 sudo systemctl status apache2
@@ -1099,7 +1099,7 @@ sudo systemctl restart coolwsd
 sudo systemctl status coolwsd
 ```
 
-#### Включить Collabora в Nextcloud
+### Включить Collabora в Nextcloud
 На сайте переходим в меню "Администрирование" и находим там вкладку "Office".
 Выбираем меню "Использовать свой сервер" и вводим 
 ```
@@ -1107,7 +1107,7 @@ https://collabora.mydomain.com
 ```
 Ниже находим меню "Allow list for WOPI requests" и вводим ip адрес сервера (в данной инструкции он знаком вам как 12.34.56.100)
 
-#### Траблшут collabora
+### Траблшут collabora
 https://sdk.collaboraonline.com/docs/installation/Collabora_Online_Troubleshooting_Guide.html
 ```bash
 journalctl -e -u coolwsd | lnav
