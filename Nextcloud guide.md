@@ -1,9 +1,3 @@
-### Оглавление
-1. [Nextcloud install](#Nextcloud install)
-2. [Collabora install](#Collabora install)
-3. [Настройка LDAP](#Настройка LDAP (ActiveDirectory authentication))
-4. [Обновление Nextcloud](#Обновление версии Nextcloud)
-
 # Nextcloud install
 
 ## Установить UbuntuServer 
