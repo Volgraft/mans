@@ -303,14 +303,6 @@ rm latest.zip
 ```bash
 sudo chown -R www-data:www-data /var/www/nextcloud/
 ```
-Смена прав на директории
-```bash
-find /var/www/nextcloud/ -type d -exec chmod 750 {} \;
-```
-Смена прав на файлы
-```bash
-find /var/www/nextcloud/ -type f -exec chmod 640 {} \;
-```
 
 ### Отключаем дефолтный apache сайт
 ```bash
