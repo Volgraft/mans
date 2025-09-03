@@ -1121,23 +1121,13 @@ sudo vim /etc/apache2/sites-available/collabora-ssl.conf
 </VirtualHost>
 </IfModule>
 ```
-Добавим в этот файл редирект на пустую страницу чтобы не отобразалась стартовая страниц apache при входе на сайт
-```bash
-sudo vim /etc/apache2/sites-enabled/collabora-le-ssl.conf
-```
+
 Ативируем конфиг в apache
 ```bash
 sudo a2ensite collabora-ssl.conf
 ```
 
 ### Для обоих вариантов
-Добавим в этот файл редирект на пустую страницу чтобы не отобразалась стартовая страниц apache при входе на сайт
-```bash
-sudo vim /etc/apache2/sites-enabled/collabora-le-ssl.conf
-```
-```
-        Redirect permanent / https://collabora.mydomain.com/
-```
 Активируем модуль ssl если не активирован
 ```bash
 sudo a2enmod ssl
