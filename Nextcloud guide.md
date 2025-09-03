@@ -3,6 +3,52 @@
 ## Установить UbuntuServer 
 В интернете великое мнодество инструкций как установить Ubuntu сервер. А если вы используете VDS то установку как правило сделают за вас.
 
+## Установить openssh на ваш компьютер
+### Если у вас Windows
+#### Установить openssh командой в powershell запущенном в режиме администратора
+```powershell
+winget install openssh
+```
+или командой
+```powershell
+Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
+```
+#### Настроить запуск ssh агента
+вручную (более безопасно)
+```powershell
+Get-Service -Name ssh-agent | Set-Service -StartupType Manual
+```
+автоматически при запуске ОС
+```powershell
+Get-Service -Name ssh-agent | Set-Service -StartupType Automatic
+```
+#### проверить статус агента
+```powershell
+Get-Service ssh-agent | Select Name, Status, StartType, DisplayName
+```
+#### Подключиться к серверу
+```
+ssh user@server_ip
+```
+
+### Если у вас Debian based Linux 
+#### Установить openssh
+```bash
+sudo apt install openssh
+```
+#### активировать и ключить демона ssh
+```bash
+sudo systemctl enable ssh --now
+```
+#### проверить статус демона
+```bash
+sudo systemctl status ssh
+```
+#### Подключиться к серверу
+```
+ssh user@server_ip
+```
+
 ## Обновить и очистить пакеты
 ```bash
 sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
@@ -81,85 +127,54 @@ sudo netplan apply
 ## Создаем и настраиваем пользователя
 ```bash
 sudo adduser vol
+```
+```
 usermod -aG sudo vol
 usermod -aG www-data vol
 ```
 
 ## Настраиваем ssh по ключу
-### Если у вас windows установить openssh командой
-#### Установить openssh командой
-```powershell
-winget install openssh
-```
-или командой
-```powershell
-Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
-```
-#### Настроить запуск ssh агента
-вручную (более безопасно)
-```powershell
-Get-Service -Name ssh-agent | Set-Service -StartupType Manual
-```
-автоматически при запуске ОС
-```powershell
-Get-Service -Name ssh-agent | Set-Service -StartupType Automatic
-```
-#### проверить статус агента
-```powershell
-Get-Service ssh-agent | Select Name, Status, StartType, DisplayName
-```
-
-### Если у вас Linux устанавливаем openssh командой
-#### Установить openssh
+### Отключаемся от сервера
 ```bash
-sudo apt install openssh
+exit
 ```
-#### активировать и ключить демона ssh
-```bash
-sudo systemctl enable ssh --now
-```
-#### проверить статус демона
-```bash
-sudo systemctl status ssh
-```
-
-### далее инструкция для windows и для linux
-#### Создаем папку .ssh и переходим в неё
+### Создаем папку .ssh и переходим в неё
 ```
 mkdir ~/.ssh
 cd ~/.ssh
 ```
-#### Создаем открытый и закрытый ключ
+### Создаем открытый и закрытый ключ
 ```
 ssh-keygen -t rsa -b 4096
 ```
-#### Смотрим названия файлов
+### Смотрим названия файлов
 ```
 ls
 ```
-#### Добавить ключ в SSH агент (НЕ тот что .pub, а тот что без расширения)
+### Добавить ключ в SSH агент 
+НЕ тот что .pub, а тот что без расширения!
 ```
 ssh-add c:/Users/admin/.ssh/key
 ```
-#### создание директории ssh на удаленном сервере по шаблону:
+### создание директории ssh на удаленном сервере по шаблону:
 ssh <remote_username>@<server_ip_address> mkdir -p .ssh
 ```bash
 ssh vol@12.34.56.100 mkdir -p .ssh
 ```
-#### скопировать публичный ключ на удаленный сервер
+### скопировать публичный ключ на удаленный сервер
 scp .\<key.pub> <remote_username>@<server_ip_address>:/home/vol/.ssh/<key.pub>
 ```bash
 scp ~/.ssh/key.pub vol@12.34.56.100:/home/vol/.ssh/key.pub
 ```
-#### подключится к удаленному серверу по ssh
+### подключится к удаленному серверу по ssh
 ```
 ssh vol@12.34.56.100
 ```
-#### экспорт публичного ключа в uthorized_keys
+### экспорт публичного ключа в uthorized_keys
 ```
 cat ~/.ssh/key.pub >> ~/.ssh/authorized_keys
 ```
-#### проверить что подключение происходит без пароля
+### проверить что подключение происходит без пароля
 отключиться
 ```
 exit
@@ -169,10 +184,10 @@ ssh vol@12.34.56.100
 ```
 Если запрашивает пароль, то что-то не так, возможно дело в правах на authorized_keys. Права на на сервере на директорию .ssh и файл authorized_keys должны быть "600"
 
-#### настраиваем sshd_config
+### настраиваем sshd_config
 Если подключение успешно и без пароля, то настраиваем sshd_config файл
 ```bash
-sudo vim /etc/ssh/sshd\_config
+sudo vim /etc/ssh/sshd_config
 ```
 Настраиваем пользователей, которые могут подключаться. Например ```AllowUsers *@192.168.*``` разрешит подключаться любому пользователю к ПК, ip которого начинается со 192.168. Это полезный дополнительный уровень защиты.
 В данной инструкции я разрешу подключаться только своему свежесозданному пользователю.
@@ -189,7 +204,7 @@ UsePAM yes
 PasswordAuthentication no
 PermitRootLogin no
 ```
-#### перезагрузить ssh демон
+### перезагрузить ssh демон
 ```bash
 sudo systemctl enable ssh
 sudo systemctl restart ssh
@@ -258,7 +273,7 @@ interactive_timeout = 28800
 # For larger queries/uploads
 max_allowed_packet = 64M
 ```
-Отредактируем фало логов
+Отредактируем файлы логов
 ```bash
 sudo vim /etc/logrotate.d/mariadb
 ```
@@ -368,14 +383,6 @@ rm latest.zip
 Смена владельца на пользователя www-data и группу www-data (в которую мы ранее для удобства добавили нашего пользователя)
 ```bash
 sudo chown -R www-data:www-data /var/www/nextcloud/
-```
-???Смена прав на директории
-```bash
-sudo find /var/www/nextcloud/ -type d -exec chmod 750 {} \;
-```
-???Смена прав на файлы
-```bash
-sudo find /var/www/nextcloud/ -type f -exec chmod 640 {} \;
 ```
 
 ## Отключаем дефолтный apache сайт
@@ -548,7 +555,7 @@ sudo vim /var/www/nextcloud/config/config.php
 sudo vim /var/www/nextcloud/config/config.php
 ```
 ```
-  'maintenance' => false,
+'maintenance' => false,
   'default_phone_region' => 'RU',
   'simpleSignUpLink.shown' => false,
   'config_is_read_only' => false,
@@ -563,7 +570,7 @@ sudo vim /var/www/nextcloud/config/config.php
 ```
 Удаляем "index.php" из url
 ```
-  'htaccess.RewriteBase' => '/',
+'htaccess.RewriteBase' => '/',
 ```
 Или можно просто выполнить occ команду
 ```bash
@@ -749,11 +756,11 @@ sudo vim /var/www/nextcloud/config/config.php
 ```
 Удаляем строку
 ```
-  'memcache.local' => '\\OC\\Memcache\\APCu',
+'memcache.local' => '\\OC\\Memcache\\APCu',
 ```
 Добавляем строки
 ```
-  'filelocking.enabled' => true,
+'filelocking.enabled' => true,
   'memcache.distributed' => '\\OC\\Memcache\\Redis',
   'memcache.local' => '\\OC\\Memcache\\Redis',
   'memcache.locking' => '\\OC\\Memcache\\Redis',
@@ -762,6 +769,27 @@ sudo vim /var/www/nextcloud/config/config.php
         'host' => '/var/run/redis/redis-server.sock',
         'port' => 0,
   ),
+```
+
+## Настройка логов
+Добавляем необходимые строки в конфиг
+```bash
+sudo vim /var/www/nextcloud/config/config.php
+```
+```
+'log_type' => "file",
+  'logfile' => '/var/log/nextcloud.log',
+  'loglevel' => 1,
+  'logdateformat' => "F d, Y H:i:s",
+```
+Создаем файлы логов
+```bash
+sudo install -o www-data -g www-data -m 0640 /dev/null /var/log/nextcloud.log
+```
+Один из вариантов просмотра логов - с помощью программы lnav
+```bash
+sudo tail -n 100 /var/log/nextcloud.log | lnav
+sudo tail -n 100 /var/log/apache2/nextcloud.log | lnav
 ```
 
 ## Настраиваем fail2ban
@@ -825,10 +853,6 @@ bantime = 1d
 findtime = 60m
 logpath = %(sshd_log)s
 ```
-Создаем файлы логов
-```bash
-sudo install -o www-data -g www-data -m 0640 /dev/null /var/log/nextcloud.log
-```
 Перезапускаем fail2ban
 ```bash
 sudo systemctl enable fail2ban && sudo systemctl restart fail2ban && sudo systemctl status fail2ban
@@ -855,13 +879,17 @@ sudo ufw allow 443/tcp
 sudo ufw allow from 0.0.0.0/0 to any port 22 proto tcp
 sudo ufw allow from 192.168.0.0/16 to any port 22 proto tcp
 ```
-Проверяем правила ufw
+Проверяем правила выключенного ufw
 ```bash
-sudo ufw status numbered
+sudo cat /etc/ufw/user*.rules | grep tuple
 ```
 Активируем ufw
 ```bash
 sudo ufw enable
+```
+Проверяем правила ufw
+```bash
+sudo ufw status numbered
 ```
 
 При необходимости
@@ -872,27 +900,6 @@ sudo ufw delete <номер>
 добавляем правило на нужную позицию ```sudo ufw insert <позиция> <правило>```  например
 ```bash
 sudo ufw insert 1 allow from 8.8.8.8 to any
-```
-
-## Настройка логов
-Добавляем необходимые строки в конфиг
-```bash
-sudo vim /var/www/nextcloud/config/config.php
-```
-```
-  'log_type' => "file",
-  'logfile' => '/var/log/nextcloud.log',
-  'loglevel' => 1,
-  'logdateformat' => "F d, Y H:i:s",
-```
-Создаем файлы логов
-```bash
-sudo install -o www-data -g www-data -m 0640 /dev/null /var/log/nextcloud.log
-```
-Один из вариантов просмотра логов - с помощью программы lnav
-```bash
-sudo tail -n 100 /var/log/nextcloud.log | lnav
-sudo tail -n 100 /var/log/apache2/nextcloud.log | lnav
 ```
 
 ## Skeleton directory
@@ -907,7 +914,7 @@ sudo install -o www-data -g www-data -m 0750 -d /opt/nextcloud_skeleton
 sudo vim /var/www/nextcloud/config/config.php
 ```
 ```
-  'skeletondirectory' => '/opt/nextcloud_skeleton',
+'skeletondirectory' => '/opt/nextcloud_skeleton',
 ```
 
 ## Настройка автоматической очистки корзины
@@ -918,7 +925,7 @@ sudo vim /var/www/nextcloud/config/config.php
 sudo vim /var/www/nextcloud/config/config.php
 ```
 ```
-  'trashbin_retention_obligation' => 'auto, 30',
+'trashbin_retention_obligation' => 'auto, 30',
 ```
 
 ## Починка индексов в базе
@@ -934,7 +941,7 @@ sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
 sudo vim  /var/www/nextcloud/config/config.php
 ```
 ```
-  'preview_max_memory' => 2048,
+'preview_max_memory' => 2048,
 ```
 
 # Collabora install
@@ -970,7 +977,10 @@ Signed-By: /usr/share/keyrings/collaboraonline-release-keyring.gpg
 
 ## Установка Collabora
 ```bash
-sudo apt update && sudo apt install coolwsd code-brand hunspell collaboraoffice*
+sudo apt update
+```
+```bash
+sudo apt install coolwsd code-brand hunspell collaboraoffice*
 ```
 
 ## Настройка Apache для Collabora
@@ -1169,6 +1179,8 @@ sudo coolconfig set ssl.termination true
 ```bash
 sudo systemctl restart apache2
 sudo systemctl status apache2
+```
+```bash
 sudo systemctl restart coolwsd
 sudo systemctl status coolwsd
 ```
@@ -1189,98 +1201,8 @@ journalctl -r -u coolwsd | lnav
 ```
 
 # Настройка LDAP (ActiveDirectory authentication)
-## Создать AD пользователя
-Создаем обычного пользователя AD. Достаточно чтобы он был в пользователях домена.
-
-## Установить php-ldap
-```bash
-sudo apt install php-ldap
-sudo systemctl restart apache2
-```
-
-## Установить LDAP app
-На сайте нати в списке приложений LDAP и установить
-
-## Настройка LDAP
-Перейти в меню "Администрирование" и там во вкладку "LDAP/AD integration". Там настроить:
-### Server
-1. Адрес сервера. Варианты:
-- 10.10.10.2 (_подключение по локальному ip без шифрования, nextcloud должен пинговать AD сервер)_
-- mydomain.local _(подключение по DNS имени, nextcloud должен понимать какой ip стоит за именем либо через hosts либо через DNS сервер, настроеный на локальном порту)_
-- ldaps://mydomain.local _(вариант с шифрованием, сработает только ели у вас AD настроен подходящим образом)_
-
-2. Порт 389 по умолчанию, если менялся то можно попробовать кнопку Detect Port или уточнить у того, кто настраивал.
-
-3. Полный путь до учетной записи пользователя. Можно посмотреть через PowerShell командой Get-ADUser, параметр DistinguishedName.
-
-4. Пароль пользователя
-
-5. Полное имя домена. Можно взять путь до пользователя и оставить все DC с конца - это и будет полное имя домена.
-
-### Users
-- Only these object classes: (выбрать person)
-- Only from these groups: (выбрать группу или группы в которой будут состоять AD пользователи nextcloud)
-
-### Login Attributes
-Ставим галочки для "When logging in, will find the user based on the following attributes:"
-"LDAP/AD Username"	✅
-LDAP/AD Email Address	✅
-Other Attributes - sAMAccountName
-
-### Groups
-Для первой настройки можно ничего не вносить.
-Здесь можно добавить AD группы пользователей, которым пользователи смогут выдавать права на папки и файлы и т.п. Еcли используются группы AD нужно, по возможности, не создавать локальные группы на сервере чтобы избежать путаницы.
 
 # Обновление версии Nextcloud
-## Maintenance mode
-Включить Maintenance mode
-```bash
-sudo -E -u www-data php /var/www/nextcloud/occ maintenance:mode --on
-```
-
-## Бекап
-Сделать бекап+снапшот сервера.
-
-## Linux update
-Проверяем что в обновлениях пакетов linux нет новых версий php и mariadb. Если есть, то необходимо протестироваль на тестовом стенде перед обновлением. Или если не долго восстанавливаться из бекапа и сервер не боевой то можно попробовать и без тестов.
-```bash
-sudo apt update && sudo apt list --upgradable
-```
-
-## Конфиг не должен быть readonly
-В файле /var/www/nextcloud/config/config.php строка config_is_read_only должна выглядеть так:
-```
-  'config_is_read_only' => false,
-```
-
-## Чиним права
-Если есть подозрение что права могли как-то поменяться, то перед обновлением лучше прогнать применение правильных прав.
-```bash
-chown -R www-data:www-data /var/www/nextcloud
-find /var/www/nextcloud/ -type d -exec chmod 750 {} \;
-find /var/www/nextcloud/ -type f -exec chmod 640 {} \;
-```
-
-## Лишние файлы
-Если в директориях, кроме директорий пользователей, есть какие-то самодельные файлы - обновление будет на них ругаться. Их необходимо удалить или переместить из директории /var/www/nextcloud в другое место.
-
-## Обновление nextcloud
-Обновляем согласно этой [статье](https://docs.nextcloud.com/server/20/admin_manual/maintenance/update.html)
-```bash
-sudo -u www-data php /var/www/nextcloud/updater/updater.phar
-```
-И далее следовать инструкциям в терминале
-
-## Чиним индексы в базе
-```bash
-sudo -u www-data  /var/www/nextcloud/occ maintenance:repair --include-expensive
-sudo -u www-data  /var/www/nextcloud/occ db:add-missing-indices
-```
-
-## Рестарт apache
-```bash
-sudo systemctl restart apache2
-```
 
 # Удаление пользователей
 
