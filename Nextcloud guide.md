@@ -11,7 +11,7 @@ sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
 ## Настроим hostname и добавим имя в hosts файл _(в данном примере "cloud")_
 ```bash
 echo "cloud" > /etc/hostname
-sudo sed -i 's/^127\\.0\\.1\\.1.\*/127.0.1.1 cloud/g' /etc/hosts
+sudo sed -i 's/^127\.0\.1\.1.*/127.0.1.1 cloud/g' /etc/hosts
 ```
 Перезагружаем Ubuntu
 ```bash
