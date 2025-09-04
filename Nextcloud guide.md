@@ -1,96 +1,95 @@
 # Nextcloud install
 
-## Установить UbuntuServer 
-В интернете великое мнодество инструкций как установить Ubuntu сервер. А если вы используете VDS то установку как правило сделают за вас.
+## 1 Install UbuntuServer 
+There are countless instructions on the Internet on how to install an Ubuntu server. And if you are using a VDS, the installation will usually be done for you.
 
-## Установить openssh на ваш компьютер
-### Если у вас Windows
-#### Установить openssh командой в powershell запущенном в режиме администратора
+## 2 Install openssh on your computer
+### 2.1 If you have Windows
+#### Install openssh with a command in PowerShell run as administrator
 ```powershell
 winget install openssh
 ```
-или командой
+or with a command
 ```powershell
 Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
 ```
-#### Настроить запуск ssh агента
-вручную (более безопасно)
+#### Configure ssh agent startup
+manually (more secure)
 ```powershell
 Get-Service -Name ssh-agent | Set-Service -StartupType Manual
 ```
-автоматически при запуске ОС
+automatically at OS startup
 ```powershell
 Get-Service -Name ssh-agent | Set-Service -StartupType Automatic
 ```
-#### проверить статус агента
+#### check agent status
 ```powershell
 Get-Service ssh-agent | Select Name, Status, StartType, DisplayName
 ```
-#### Подключиться к серверу
+#### Connect to the server
 ```
 ssh user@server_ip
 ```
 
-### Если у вас Debian based Linux 
-#### Установить openssh
+### 2.2 If you have Debian based Linux
+#### Install openssh
 ```bash
 sudo apt install openssh
 ```
-#### активировать и ключить демона ssh
+#### activate and start the ssh daemon
 ```bash
 sudo systemctl enable ssh --now
 ```
-#### проверить статус демона
+#### check daemon status
 ```bash
 sudo systemctl status ssh
 ```
-#### Подключиться к серверу
+#### Connect to the server
 ```
 ssh user@server_ip
 ```
 
-## Обновить и очистить пакеты
+## 3 Update and clean packages
 ```bash
 sudo apt update && sudo apt upgrade -y && sudo apt autoremove -y
 ```
 
-## Настроим hostname и добавим имя в hosts файл _(в данном примере "cloud")_
+## 4 Configure hostname and add a name to the hosts file _(in this example "cloud")_
 ```bash
 echo "cloud" > /etc/hostname
 sudo sed -i 's/^127\.0\.1\.1.*/127.0.1.1 cloud/g' /etc/hosts
 ```
-Перезагружаем Ubuntu
+Reboot Ubuntu
 ```bash
 sudo reboot
 ```
 
-## Настроим timezone
-Список таймзон можно посмотреть командой
+## 5 Configure timezone
+You can see the list of timezones with the command
 ```bash
-timedatectl list-timezones # все таймзоны
-timedatectl list-timezones | grep Europe  # европейские таймзоны
+timedatectl list-timezones # all timezones
+timedatectl list-timezones | grep Europe  # Europe timezones
 ```
-Команда установки таймзоны
+Timezone setting command
 ```bash
 sudo timedatectl set-timezone Europe/Helsinki
 ```
 
-## Настроить сетевые интерфейсы
-Если вы арендовали у провайдера глобальны ip специального для этого сервера, то необходмо его настроить по инструкции ниже. Если у вас облачный сервер то вероятно способ настройки ip будет отличаться или ip уже настроен при развертывании.
-Текущий ip сервера можно посмотреть командой
+## 6 Configure network interfaces
+If you rented a global IP from a provider specifically for this server, then you need to configure it according to the instructions below. If you have a cloud server, then probably the way of configuring the IP will differ, or the IP is already set during deployment.
+You can check the current server IP with the command
 ```bash
 ip -c a
 ```
-
-Делаем бекап конфига
+Make a config backup
 ```bash
 sudo cp -a /etc/netplan/50-cloud-init.yaml{,.orig}
 ```
-Смотрим имя интерфейса
+Check the interface name
 ```
 ip -c -br a
 ```
-Редактируем конфиг
+Edit the config
 ```
 sudo vim /etc/netplan/50-cloud-init.yaml
 ```
@@ -111,20 +110,20 @@ network:
           - 12.34.56.4
           - 8.8.8.8
 ```
-Тестово применяем конфиг и проверяем соединение за 15 секунд теста
+Test apply the config and check the connection with a 15-second test and check ping to new ip in these 15 sec
 ```bash
 sudo netplan try --timeout 15
 ```
-Если тест прошел успешно, то применяем конфиг
+If the test was successful, apply the config
 ```bash
 sudo netplan apply
 ```
-При необходимости добавляем ip в /etc/hosts (делаем это только если у вас есть понимание с какой целью)
+If necessary, add the IP to /etc/hosts (do this only if you understand the purpose)
 ```
 192.168.1.100 cloud.mydom.com collabora.mydom.com
 ```
 
-## Создаем и настраиваем пользователя
+## 7 Create and configure a user
 ```bash
 sudo adduser vol
 ```
@@ -133,101 +132,101 @@ usermod -aG sudo vol
 usermod -aG www-data vol
 ```
 
-## Настраиваем ssh по ключу
-### Отключаемся от сервера
+## 8 Configure ssh with a key
+### 8.1 Disconnect from the server
 ```bash
 exit
 ```
-### Создаем папку .ssh и переходим в неё
+### 8.2 Create a .ssh folder and swich into it
 ```
 mkdir ~/.ssh
 cd ~/.ssh
 ```
-### Создаем открытый и закрытый ключ
+### 8.3 Create public and private key
 ```
 ssh-keygen -t rsa -b 4096
 ```
-### Смотрим названия файлов
+### 8.4 Check file names
 ```
 ls
 ```
-### Добавить ключ в SSH агент 
-НЕ тот что .pub, а тот что без расширения!
+### 8.5 Add key to SSH agent
+NOT the one with .pub, but the one without extension!
 ```
 ssh-add c:/Users/admin/.ssh/key
 ```
-### создание директории ssh на удаленном сервере по шаблону:
+### 8.6 create ssh directory on remote server with this command
 ssh <remote_username>@<server_ip_address> mkdir -p .ssh
 ```bash
 ssh vol@12.34.56.100 mkdir -p .ssh
 ```
-### скопировать публичный ключ на удаленный сервер
-scp .\<key.pub> <remote_username>@<server_ip_address>:/home/vol/.ssh/<key.pub>
+### 8.7 copy public key to remote server
+scp .<key.pub> <remote_username>@<server_ip_address>:/home/vol/.ssh/<key.pub>
 ```bash
 scp ~/.ssh/key.pub vol@12.34.56.100:/home/vol/.ssh/key.pub
 ```
-### подключится к удаленному серверу по ssh
+### 8.8 connect to remote server
 ```
 ssh vol@12.34.56.100
 ```
-### экспорт публичного ключа в uthorized_keys
+### 8.9 export public key to authorized_keys
 ```
 cat ~/.ssh/key.pub >> ~/.ssh/authorized_keys
 ```
-### проверить что подключение происходит без пароля
-отключиться
+### 8.10 check that the connection is passwordless
+disconnect
 ```
 exit
 ```
 ```
 ssh vol@12.34.56.100
 ```
-Если запрашивает пароль, то что-то не так, возможно дело в правах на authorized_keys. Права на на сервере на директорию .ssh и файл authorized_keys должны быть "600"
+If it asks for a password, something is wrong, possibly the permissions on authorized_keys. The permissions on the server for the .ssh directory and authorized_keys file should be "600"
 
-### настраиваем sshd_config
-Если подключение успешно и без пароля, то настраиваем sshd_config файл
+### 8.11 set sshd_config
+If the connection is successful and passwordless, configure the sshd_config file
 ```bash
 sudo vim /etc/ssh/sshd_config
 ```
-Настраиваем пользователей, которые могут подключаться. Например ```AllowUsers *@192.168.*``` разрешит подключаться любому пользователю к ПК, ip которого начинается со 192.168. Это полезный дополнительный уровень защиты.
-В данной инструкции я разрешу подключаться только своему свежесозданному пользователю.
+Configure which users can connect. For example, ```AllowUsers *@192.168.*``` will allow any user to connect from a PC whose IP starts with 192.168. This is a useful extra level of protection.
+In this instruction, I will only allow my newly created user to connect.
 ```
 AllowUsers vol@*
 ```
-Про желании можно поменять порт по умолчанию, не забудьте об этом когда будете настраивать фаервол.
+If desired, you can change the default port, don’t forget about it when configuring the firewall.
 ```
 Port 2822
 ```
-Меняем остальные настройки
+Change other settings
 ```
 UsePAM yes
 PasswordAuthentication no
 PermitRootLogin no
 ```
-### перезагрузить ssh демон
+### 8.12 restart ssh daemon
 ```bash
 sudo systemctl enable ssh
 sudo systemctl restart ssh
 ```
 
-## Создаем доменную запись
-Необходимо создать доменную "A" запись на доменном хостинге который вы приобрели или на локальном доменном сервере если не планируете использовать https. В данной инструкции это будет **cloud.mydomain.com**
+## 9 Create a domain record
+You need to create a domain "A" record on the domain hosting you purchased or on a local domain server if you do not plan to use https. In this instruction it will be **cloud.mydomain.com**
 
-https://www.google.com/search?q=купить+домен
+https://www.google.com/search?q=buy+domain
 
-Или если прямо сейчас вы не хотите покупать домен, есть альтернативный способ. Вы можете использовать сайт https://freemyip.com и получить доменное имя бесплатно но тогда вместо cloud у вас будет какое-то другое имя, внимательно следуйте инструкции чтобы не забыть поменять имя где это необходимо.
+Or if you don’t want to buy a domain right now, there is an alternative way. You can use [https://freemyip.com](https://freemyip.com?utm_source=chatgpt.com) and get a domain name for free, but then instead of "cloud" you will have some other name. Follow the instructions carefully so as not to forget to change the name where necessary.
 
-## Установка и настройка базы данных
-Устанавливаем mariadb-server
+## 10 Install and configure database
+Install mariadb-server
 ```bash
 sudo apt install mariadb-server -y && systemctl status mariadb
 ```
-Если вы планируете расположить базу данных отдельно от web сервера то на web сервер достаточно установить клиент.
+If you plan to place the database separately from the web server, then it is enough to install the client on the web server.
 ```bash
 sudo apt install mariadb-client -y
 ```
 
-## Настройки безопасности MariaDB
+## 11 MariaDB security settings
 Ubuntu 24.04
 ```bash
 sudo mysql_secure_installation
@@ -236,7 +235,7 @@ Ubuntu 25.04
 ```bash
 sudo mariadb-secure-installation
 ```
-Далее выбираем следующие параметры:
+Then select the following parameters:
 - Enter current password for root (enter for none): <Enter>
 - Switch to unix_socket authentication [Y/n] : n
 - Change the root password? [Y/n]: y
@@ -245,12 +244,12 @@ sudo mariadb-secure-installation
 - Remove test database and access to it? [Y/n]: y
 - Reload privilege tables now? [Y/n]: y
 
-## Настройки конфига MariaDB
-Открываем файл конфига mariadb
+## 12 Set the mariadb config file
+Open the mariadb config file
 ```bash
 sudo vim /etc/mysql/my.cnf
 ```
-И добавляем в конец файла следующие строки, которые отсутствуют в файле
+And add the following lines at the end of the file, which are missing in the file
 ```c
 [mysqld]
 log_error = /var/log/mysql/error.log
@@ -273,31 +272,30 @@ interactive_timeout = 28800
 # For larger queries/uploads
 max_allowed_packet = 64M
 ```
-Отредактируем файлы логов
+Edit log files
 ```bash
 sudo vim /etc/logrotate.d/mariadb
 ```
-вместо
+instead of
 ```
   monthly
   rotate 6
 ```
-пишем
+write
 ```
 	daily
 	rotate 14
 ```
-и ещё можно отредактировать размер файлов логов
+and you can also edit the log file sizes
 ```
 	maxsize 500M
 	minsize 50M
 ```
-Перезапускаем mariadb
+Restart mariadb
 ```bash
 sudo systemctl restart mariadb
 ```
-
-Создаем директорию с логами и лог файлы и меняем владельца
+Create a directory with logs and log files and change the owner
 ```bash
 sudo install -o mysql -g mysql -m 0750 -d /var/log/mysql
 sudo install -o mysql -g mysql -m 0640 /dev/null /var/log/mysql/error.log
@@ -305,92 +303,92 @@ sudo install -o mysql -g mysql -m 0640 /dev/null /var/log/mysql/general.log
 sudo install -o mysql -g mysql -m 0640 /dev/null /var/log/mysql/slow.log
 ```
 
-## Создание базы nextcloud
-Заходим в базу mariadb
+## 13 Create nextcloud database
+Log in to mariadb
 ```bash
 sudo mariadb
 ```
-Создаем базу
+Create a database
 ```sql
 CREATE DATABASE nextcloud;
 ```
-Смотрим что база создалась
+Check that the database was created
 ```sql
 SHOW DATABASES;
 ```
-Создаем пользователя и выдаем ему полные права на базу nextcloud при обращении с localhost. Не забываем выдать свой пароль, важно чтобы он был сложный и желательно из случайных символов. Он будет хранится в /var/www/nextcloud/config/config.php
+Create a user and grant full rights on the nextcloud database when accessed from localhost. Don’t forget to set your own password, it is important that it is strong and preferably random characters. It will be stored in /var/www/nextcloud/config/config.php
 ```sql
 GRANT ALL PRIVILEGES ON nextcloud.* TO 'nextcloud'@'localhost' IDENTIFIED BY 'mypassword';
 ```
-Если забыли поменять пароль, то это можно сделать следующей командой
+If you forgot to change the password, you can do it with the following command
 ```sql
 ALTER USER 'nextcloud'@'localhost' IDENTIFIED BY 'new_password';
 ```
-Обновляем права
+Update privileges
 ```sql
 FLUSH PRIVILEGES;
 ```
-Выходим из mariadb
+Exit mariadb
 ```sql
 exit
 ```
 
-## Установка WEB сервера
-Устанавливаем необходимые пакеты
+## 14 Install WEB server
+Install necessary packages
 ```bash
 sudo apt install vim apache2 php php-apcu php-bcmath php-cli php-common php-curl php-gd php-gmp php-imagick php-intl php-mbstring php-mysql php-zip php-xml -y 
 ```
-Проверяем работу apache
+Check apache operation
 ```bash
 sudo systemctl status apache2
 ```
 
-## Активируем PHP расширения
+## 15 Activate PHP extensions
 ```bash
 sudo phpenmod bcmath gmp imagick intl
 ```
 
-## Скачиваем пакет nextcloud
-Последнюю версию
+## 16 Download nextcloud package
+Latest version
 ```bash
 wget https://download.nextcloud.com/server/releases/latest.zip
 ```
-Или если вам необходима предыдущая версия мо можно скачать с сайта
+Or if you need the previous version you can download from
 https://nextcloud.com/changelog/
-например
+for example
 ```bash
 https://download.nextcloud.com/server/releases/nextcloud-31.0.7.zip
 
 mv nextcloud-31.0.7.zip latest.zip
 ```
 
-## Установка nextcloud
-Установить unzip если не установлен
+## 17 Install nextcloud
+Install unzip if not installed
 ```bash
 sudo apt install unzip
 ```
-Распаковать архив и переместить в нужную директорию
+Unzip archive and move to the desired directory
 ```bash
 unzip latest.zip
 sudo mv nextcloud /var/www/
 ```
-Освобождаем место удаляя архив
+Free space by deleting the archive
 ```bash
 rm latest.zip
 ```
 
-## Редактируем права и владельца всей директории nextcloud
-Смена владельца на пользователя www-data и группу www-data (в которую мы ранее для удобства добавили нашего пользователя)
+## 18 Edit permissions and owner of nextcloud directory
+Change owner to user www-data and group www-data (to which we previously added our user for convenience)
 ```bash
 sudo chown -R www-data:www-data /var/www/nextcloud/
 ```
 
-## Отключаем дефолтный apache сайт
+## 19 Disable default apache site
 ```bash
 sudo a2dissite 000-default.conf
 ```
 
-## Настроиваем сайт nextcloud
+## 20 Configure nextcloud site
 ```bash
 sudo vim /etc/apache2/sites-available/nextcloud.conf
 ```
@@ -412,14 +410,14 @@ sudo vim /etc/apache2/sites-available/nextcloud.conf
 </VirtualHost>
 ```
 
-## Активируем сайт nextcloud
+## 21 Activate nextcloud site
 ```bash
 sudo a2ensite nextcloud.conf
 ```
 
-## Правим конфиг apache
-### Ubuntu 24.04
-Смотрим текущие параметры важных настроек
+## 22 Edit apache config
+### 22.1 Ubuntu 24.04
+Check current important settings
 ```bash
 cat /etc/php/8.3/apache2/php.ini | grep 'memory_limit = '
 cat /etc/php/8.3/apache2/php.ini | grep 'upload_max_filesize ='
@@ -433,7 +431,7 @@ cat /etc/php/8.3/apache2/php.ini | grep 'opcache.memory_consumption='
 cat /etc/php/8.3/apache2/php.ini | grep 'opcache.save_comments='
 cat /etc/php/8.3/apache2/php.ini | grep 'opcache.revalidate_freq='
 ```
-Заменяем параметры по умолчанию на требуемые для nextcloud
+Replace default settings with those required for nextcloud
 ```bash
 sudo sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 200M/g' /etc/php/8.3/apache2/php.ini
 sudo sed -i 's/max_execution_time = 30/max_execution_time = 360/g' /etc/php/8.3/apache2/php.ini
@@ -446,17 +444,17 @@ sudo sed -i 's/;opcache.memory_consumption=128/opcache.memory_consumption=128/g'
 sudo sed -i 's/;opcache.save_comments=1/opcache.save_comments=1/g' /etc/php/8.3/apache2/php.ini
 sudo sed -i 's/;opcache.revalidate_freq=2/opcache.revalidate_freq=1/g' /etc/php/8.3/apache2/php.ini
 ```
-Настраиваем memory_limit. Для стандартного конфига достаточно 512M:
+Set memory_limit. For standard config, 512M is enough:
 ```bash
 sudo sed -i 's/memory_limit = 128M/memory_limit = 512M/g' /etc/php/8.3/apache2/php.ini
 ```
-А если у вас есть достаточно оперативной памяти(указанный объем будет выделяться на каждого пользователя) и вы собираетесь просматривать RAW изображения то можете установить 2048M:
+If you have enough RAM (the specified amount will be allocated per user) and you plan to view RAW images, you can set 2048M:
 ```bash
 sudo sed -i 's/memory_limit = 128M/memory_limit = 2048M/g' /etc/php/8.3/apache2/php.ini
 ```
-Снова проводим проверку параметров первой командой из этого пункта, вывод должен быть следующим:
+Check the settings again with the first command from this section, the output should be as follows:
 ```
-memory_limit = 512M #(или 2048M)
+memory_limit = 512M #(or 2048M)
 upload_max_filesize = 200M
 max_execution_time = 360
 post_max_size = 200M
@@ -469,8 +467,8 @@ opcache.save_comments=1
 opcache.revalidate_freq=1
 ```
 
-### Ubuntu 25.04
-Смотрим текущие параметры важных настроек
+### 22.1 Ubuntu 25.04
+Check current important settings
 ```bash
 cat /etc/php/8.4/apache2/php.ini | grep 'memory_limit = '
 cat /etc/php/8.4/apache2/php.ini | grep 'upload_max_filesize ='
@@ -484,7 +482,7 @@ cat /etc/php/8.4/apache2/php.ini | grep 'opcache.memory_consumption='
 cat /etc/php/8.4/apache2/php.ini | grep 'opcache.save_comments='
 cat /etc/php/8.4/apache2/php.ini | grep 'opcache.revalidate_freq='
 ```
-Заменяем параметры по умолчанию на требуемые для nextcloud
+Replace default settings with those required for nextcloud
 ```bash
 sudo sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 200M/g' /etc/php/8.4/apache2/php.ini
 sudo sed -i 's/max_execution_time = 30/max_execution_time = 360/g' /etc/php/8.4/apache2/php.ini
@@ -497,17 +495,17 @@ sudo sed -i 's/;opcache.memory_consumption=128/opcache.memory_consumption=128/g'
 sudo sed -i 's/;opcache.save_comments=1/opcache.save_comments=1/g' /etc/php/8.4/apache2/php.ini
 sudo sed -i 's/;opcache.revalidate_freq=2/opcache.revalidate_freq=1/g' /etc/php/8.4/apache2/php.ini
 ```
-Настраиваем memory_limit. Для стандартного конфига достаточно 512M:
+Set memory_limit. For standard config, 512M is enough:
 ```bash
 sudo sed -i 's/memory_limit = 128M/memory_limit = 512M/g' /etc/php/8.4/apache2/php.ini
 ```
-А если у вас есть достаточно оперативной памяти(указанный объем будет выделяться на каждого пользователя) и вы собираетесь просматривать RAW изображения то можете установить 2048M:
+If you have enough RAM (the specified amount will be allocated per user) and you plan to view RAW images, you can set 2048M:
 ```bash
 sudo sed -i 's/memory_limit = 128M/memory_limit = 2048M/g' /etc/php/8.4/apache2/php.ini
 ```
-Снова проводим проверку параметров первой командой из этого пункта, вывод должен быть следующим:
+Check the settings again with the first command from this section, the output should be as follows:
 ```
-memory_limit = 512M #(или 2048M)
+memory_limit = 512M #(or 2048M)
 upload_max_filesize = 200M
 max_execution_time = 360
 post_max_size = 200M
@@ -520,23 +518,23 @@ opcache.save_comments=1
 opcache.revalidate_freq=1
 ```
 
-## Перезапускаем apache
-Ещё раз убеждаемся что модификаторы apache включены и исправны и перезапускаем apache
+## 23 Restart apache
+Make sure apache modules are enabled and working, then restart apache
 ```bash
 sudo a2enmod dir env headers mime rewrite ssl
 sudo systemctl restart apache2
 ```
 
-## Переходим на сайт и завершаем первичную установку
+## 24 Go to the site and finish the initial installation
 http://12.34.56.100
 
-## Устанавливаем дополнительный софт
-Здесь собран софт для функционирования nextcloud, популярных nextcloud плагинов и базового дебага linux
+## 25 Install additional software
+Here is software for nextcloud functionality, popular nextcloud plugins and basic linux debugging
 ```bash
 sudo apt install libapache2-mod-php imagemagick ffmpeg php-bz2 php-redis redis-server redis-server php-redis cron ncdu lnav net-tools iotop htop snapd -y
 ```
 
-## Правим trusted_domains и overwrite.cli.url
+## 26 Edit trusted_domains and overwrite.cli.url
 ```bash
 sudo vim /var/www/nextcloud/config/config.php
 ```
@@ -549,8 +547,8 @@ sudo vim /var/www/nextcloud/config/config.php
 'overwrite.cli.url' => 'https://cloud.mydomain.com',
 ```
 
-## Дополнительные настройки
-Добавляем эти параметры в конфиг
+## 27 Additional settings
+Add these parameters to the config
 ```bash
 sudo vim /var/www/nextcloud/config/config.php
 ```
@@ -564,20 +562,20 @@ sudo vim /var/www/nextcloud/config/config.php
   'memcache.local' => '\\OC\\Memcache\\APCu',
 ```
 
-## Делаем url ссылок короче
+## 28 Make URLs shorter
 ```bash
 sudo vim /var/www/nextcloud/config/config.php
 ```
-Удаляем "index.php" из url
+Remove "index.php" from url
 ```
 'htaccess.RewriteBase' => '/',
 ```
-Или можно просто выполнить occ команду
+Or just run occ command
 ```bash
 sudo php /var/www/nextcloud/occ maintenance:update:htaccess
 ```
 
-## Убираем ошибку Image Magick error
+## 29 Fix Image Magick error
 Ubuntu 24.04
 ```bash
 sudo apt install libmagickcore-6.q16-6-extra
@@ -588,22 +586,22 @@ Ubuntu 25.04
 sudo apt install libmagickcore-7.q16-10-extra
 ```
 
-Если установка не успешна то вбиваете команду ниже и нажимаете **Tab**. После этого выбираете пакет из доступных с пометкой extra
+If installation fails, enter the command below and press Tab. After that select the package with _extra_ tag
 ```bash
 sudo apt install --simulate libmagickcore-
 ```
 
-## Настроить сертификат
-### Настройка через certbot
-Устанавливаем snap
+## 30 Configure certificate
+### 30.1 Setup via certbot
+Install snap
 ```bash
 sudo apt install snapd
 ```
 
-Действуем по инструкции для apache через snap с сайта
+Follow instructions for apache via snap from the site
 https://certbot.eff.org/instructions
 
-После выполнения инструкции и успешного получения сертификата в ssl конфиг файл добавляем строку:
+After successful certificate acquisition, add the line to ssl config file:
 ```bash
 sudo vim /etc/apache2/sites-available/nextcloud-le-ssl.conf
 ```
@@ -617,24 +615,27 @@ Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains
 </IfModule>
 ```
 
-### Настройка вручную
-На сервере создаем директорию ssl
+### 30.1 Manual setup
+On the server, create ssl directory
 ```bash
 sudo mkdir /etc/apache2/ssl
 ```
-Меняем владельца на пользователя, через которого бум копировать файлы
+Change owner to user who will copy the files
 ```bash
 sudo chown vol: /etc/apache2/ssl
 ```
-Отключаемся от сервера, в терминале на локальном пк переходи в папку с сертификатом и ключом и копируем их на сервер.
+Disconnect from server, in terminal on local PC go to folder with certificate and key and copy them to the server.
+```bash
+exit
+```
 ```
 scp ./ssl/mydomain.* vol@cloud.mydomain.ru:/etc/apache2/ssl
 ```
-Снова подключаемся на сервер и возвращаем права в норму
+Reconnect to server and restore normal permissions
 ```bash
 sudo chown -R root: /etc/apache2/ssl
 ```
-Далее создаем ssl конфиг apache
+Then create ssl config for apache
 ```bash
 sudo vim /etc/apache2/sites-available/nextcloud-ssl.conf
 ```
@@ -662,21 +663,21 @@ sudo vim /etc/apache2/sites-available/nextcloud-ssl.conf
 </VirtualHost>
 </IfModule>
 ```
-Активируем модуль ssl в apache
+### 30.2 Enable ssl module in apache
 ```bash
 sudo a2enmod ssl
 ```
-Активируем только что созданный конфиг https
+### 30.3 Enable newly created https config
 ```bash
 sudo a2ensite nextcloud-ssl.conf
 ```
-Перезапускаем apache
+### 30.4 Restart apache
 ```bash
 sudo systemctl reload apache2
 ```
 
-## Редирект с 80 порта на 443 порт
-Создаем конфиг
+## 31 Redirect from port 80 to port 443
+Create config
 ```bash
 sudo vim /etc/apache2/sites-available/nc-redir.conf
 ```
@@ -689,55 +690,55 @@ sudo vim /etc/apache2/sites-available/nc-redir.conf
    RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
 </VirtualHost>
 ```
-Перезапускаем apache
+Restart apache
 ```
 sudo systemctl restart apache2
 ```
 
-## Настрока cron
-Файл cron это основной файл отвечающий за автоматизацию всех процессов: атоматические операции с файлами, корзиной, базой данных и т.п. 
-**Когда в /var/www/nextcloud/config/config.php стоит 'maintenance' => true, cron файл пропускает выполнение по расписанию.**
+## 32 Configure cron
+Cron file is the main file responsible for automation of all processes: automatic file operations, trash, database, etc.
+**When in /var/www/nextcloud/config/config.php there is 'maintenance' => true, nextcloud cron script  skips execution.**
 
-Установим cron если ещё не установлен
+Install cron if not yet installed
 ```bash
 sudo apt install cron
 ```
-Ативируем автоматический запуск вместе с системой
+Enable autostart with system
 ```bash
 sudo systemctl enable cron --now
 ```
-Отредактируем cron файл от имени пользователя www-data т.к. только ему выданы все необходимые cron файлу права
+Edit cron file as user www-data since only it has all necessary permissions for nextcloud cron file
 ```bash
 sudo -u www-data EDITOR=vim crontab -e
 ```
-Все строки начинающиеся с # можно удалить и по итогу получится следующее:
-_Рекомендуется ставить перенос строки в конце cron файла._
+All lines starting with # can be deleted and the result will be:
+_It is recommended to add a newline at the end of the cron file._
 ```
 */5  *  *  *  * php -f /var/www/nextcloud/cron.php
 
 ```
-Проверяем что файл успешно записан
+Check that the file was successfully written
 ```bash
 sudo -u www-data crontab -l
 ```
 
-## Настраиваем Redis
-Redis — это хранящаяся в оперативной памяти  база данных которая работает как очень быстрая «временная память», которуя используется для кеша и очередей.
-В Nextcloud Redis нужен, чтобы хранить сессии пользователей и кешировать разные данные. Так сайт работает быстрее, а одновременные запросы обрабатываются без заметных задержек и конфликтов.
+## 33 Setup Redis
+Redis is an in-memory database that works as very fast "temporary memory" used for cache and queues.
+In Nextcloud Redis is needed to store user sessions and cache various data. This makes the site faster, and simultaneous requests are handled without noticeable delays and conflicts.
 
-Устанавливаем Redis
+Install Redis
 ```bash
 sudo apt install redis-server php-redis
 ```
-Даем пользователю www-data права на упраление redis
+Give www-data user rights to manage redis
 ```bash
 sudo usermod -aG redis www-data
 ```
-Перезапускаем apache
+Restart apache
 ```bash
 sudo systemctl restart apache2
 ```
-Настраиваем в конфиге redis следующие строки
+Configure the following lines in redis config
 ```bash
 sudo vim /etc/redis/redis.conf
 ```
@@ -746,19 +747,19 @@ unixsocket /var/run/redis/redis-server.sock
 unixsocketperm 770
 port 0
 ```
-Перезапускае Redis
+Restart Redis
 ```bash
 sudo systemctl restart redis
 ```
-Настраиваем конфиг nextcloud под Redis
+Configure nextcloud config for Redis
 ```bash
 sudo vim /var/www/nextcloud/config/config.php
 ```
-Удаляем строку
+Add lines
 ```
 'memcache.local' => '\\OC\\Memcache\\APCu',
 ```
-Добавляем строки
+Add rows
 ```
 'filelocking.enabled' => true,
   'memcache.distributed' => '\\OC\\Memcache\\Redis',
@@ -771,8 +772,8 @@ sudo vim /var/www/nextcloud/config/config.php
   ),
 ```
 
-## Настройка логов
-Добавляем необходимые строки в конфиг
+## 34 Configure logs
+Add necessary lines to config
 ```bash
 sudo vim /var/www/nextcloud/config/config.php
 ```
@@ -782,34 +783,34 @@ sudo vim /var/www/nextcloud/config/config.php
   'loglevel' => 1,
   'logdateformat' => "F d, Y H:i:s",
 ```
-Создаем файлы логов
+Create log files
 ```bash
 sudo install -o www-data -g www-data -m 0640 /dev/null /var/log/nextcloud.log
 ```
-Один из вариантов просмотра логов - с помощью программы lnav
+One way to view logs - using lnav program
 ```bash
 sudo tail -n 100 /var/log/nextcloud.log | lnav
 sudo tail -n 100 /var/log/apache2/nextcloud.log | lnav
 ```
 
-## Настраиваем fail2ban
-Устанавливаем fail2ban
+## 35 Configure fail2ban
+Install fail2ban
 ```bash
 sudo apt install fail2ban
 ```
-Копируем конфиги чтобы они не стерлись при обновлении
+Copy configs so they won’t be erased during update
 ```bash
 sudo cp /etc/fail2ban/fail2ban.conf /etc/fail2ban/fail2ban.local
 sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 ```
-Раскомментируем строку ignoreip
+Uncomment ignoreip line
 ```bash
 sudo vim /etc/fail2ban/jail.local
 ```
 ```
 ignoreip = 127.0.0.1/8 ::1
 ```
-Создаем конфиг nextcloud. Актуальный конфиг можно найти на [офф сайте](https://docs.nextcloud.com/server/19/admin_manual/installation/harden_server.html?highlight=fail2ban#setup-fail2ban)
+Create nextcloud config. Current config can be found on [official site](https://docs.nextcloud.com/server/19/admin_manual/installation/harden_server.html?highlight=fail2ban#setup-fail2ban)
 ```bash
 sudo vim /etc/fail2ban/filter.d/nextcloud.conf
 ```
@@ -821,7 +822,7 @@ failregex = ^\{%(_groupsre)s,?\s*"remoteAddr":"<HOST>"%(_groupsre)s,?\s*"message
             ^\{%(_groupsre)s,?\s*"remoteAddr":"<HOST>"%(_groupsre)s,?\s*"message":"Trusted domain error.
 datepattern = ,?\s*"time"\s*:\s*"%%Y-%%m-%%d[T ]%%H:%%M:%%S(%%z)?"
 ```
-Создаем jail конфиг для nextcloud
+Create jail config for nextcloud
 ```bash
 sudo vim /etc/fail2ban/jail.d/nextcloud.local
 ```
@@ -837,7 +838,7 @@ bantime = 86400
 findtime = 3600
 logpath = /var/log/nextcloud.log
 ```
-Создаем jail конфиг для ssh
+Create jail config for ssh
 ```bash
 sudo vim /etc/fail2ban/jail.d/sshd.local
 ```
@@ -853,25 +854,25 @@ bantime = 1d
 findtime = 60m
 logpath = %(sshd_log)s
 ```
-Перезапускаем fail2ban
+Restart fail2ban
 ```bash
 sudo systemctl enable fail2ban && sudo systemctl restart fail2ban && sudo systemctl status fail2ban
 ```
 
-## UFW базовый фаервол
-Устанавливаем ufw
+## 36 UFW basic firewall
+Install ufw
 ```bash
 sudo apt install ufw 
 ```
-Проверяем чтобы IPV6 тоже фильтровался
+Check that IPV6 is also filtered
 ```bash
 sudo vim /etc/default/ufw
 ```
 ```
 IPV6=yes
 ```
-Настраиваем правила ufw
-Если вы меняли порт ssh то поменяйте 22 порт на свой.
+Configure ufw rules
+If you changed ssh port then replace port 22 with yours.
 ```bash
 sudo ufw default deny incoming
 sudo ufw allow 80/tcp
@@ -879,37 +880,37 @@ sudo ufw allow 443/tcp
 sudo ufw allow from 0.0.0.0/0 to any port 22 proto tcp
 sudo ufw allow from 192.168.0.0/16 to any port 22 proto tcp
 ```
-Проверяем правила выключенного ufw
+Check rules with ufw disabled
 ```bash
 sudo cat /etc/ufw/user*.rules | grep tuple
 ```
-Активируем ufw
+Enable ufw
 ```bash
 sudo ufw enable
 ```
-Проверяем правила ufw
+Check ufw rules
 ```bash
 sudo ufw status numbered
 ```
 
-При необходимости
-удаляем ненужное правило
+If necessary
+delete unnecessary rule
 ```bash
-sudo ufw delete <номер>
+sudo ufw delete <number>
 ```
-добавляем правило на нужную позицию ```sudo ufw insert <позиция> <правило>```  например
+add rule at desired position ```sudo ufw insert <position> <rule>``` for example
 ```bash
 sudo ufw insert 1 allow from 8.8.8.8 to any
 ```
 
-## Skeleton directory
-Когда создается новый пользователь, у него в nextcloud уже есть некоторый набор файлов. Они копируются из Skeleton directory по умолчанию. Если хотите настроить свой набор файлов по умолчанию или чтобы их вообще не было - нужно настроить свою Skeleton directory. **Внимание, не редактируте ничего в Skeleton directory по умолчанию т.к. неминуемо встретите проблемы при обновлении.**
+## 37 Skeleton directory
+When a new user is created, nextcloud already has some files. They are copied from the Skeleton directory by default (/var/www/nextcloud/core/skeleton). If you want to configure your own default files set or none at all – configure your own Skeleton directory. **Attention, do not edit anything in default Skeleton directory as you will inevitably encounter issues during update.**
 
-Создаем директорию под Skeleton directory
+Create directory for Skeleton directory
 ```bash
 sudo install -o www-data -g www-data -m 0750 -d /opt/nextcloud_skeleton
 ```
-Добавляем сроку в конфиг
+Add line to config
 ```bash
 sudo vim /var/www/nextcloud/config/config.php
 ```
@@ -917,10 +918,10 @@ sudo vim /var/www/nextcloud/config/config.php
 'skeletondirectory' => '/opt/nextcloud_skeleton',
 ```
 
-## Настройка автоматической очистки корзины
-По умолчанию в nextcloud под корзину отводится половина свободного места, выделенного пользователю и автоматическое удаление самых старых удаленных файлов при нехватке места. При таком раскладе если вы единовременно загружаете файлы общим объемом больше половины свободного места то параллельно в загрузкой начинает происходить удаление что может замедлить процесс загрузки и нагрузить сервер. Так же это может значительно увеличивать размер бекапов.
+## 38 Set auto trashbin cleanup
+By default, nextcloud allocates half of the free space to trash and automatically deletes the oldest deleted files when space runs out. With this setup, if you upload files larger than half of free space, deletion begins simultaneously with upload, slowing down process and loading the server. This can also greatly increase backup size.
 
-Чтобы настроить автоматическую очистку корзины от файлов, удаленных более 30 дней назад, добавьте в конфиг эту строку:
+To configure auto cleanup of files deleted more than 30 days ago, add this line to config:
 ```bash
 sudo vim /var/www/nextcloud/config/config.php
 ```
@@ -928,15 +929,15 @@ sudo vim /var/www/nextcloud/config/config.php
 'trashbin_retention_obligation' => 'auto, 30',
 ```
 
-## Починка индексов в базе
-Иногда после установки или обновления требуется починить индексы в базе данных
+## 39 Fix database indexes
+Sometimes after installation or update you need to fix database indexes
 ```bash
 sudo -u www-data php /var/www/nextcloud/occ maintenance:repair --include-expensive
 sudo -u www-data php /var/www/nextcloud/occ db:add-missing-indices
 ```
 
-## Увеличить лимит памяти
-Если ранее в конфиге /etc/php/8.*/apache2/php.ini вы установили memory_limit = 2048M то нужно добавить строку в конфиг. Это необходимо например для корректного отборажения превью крупных изображений в приложении Memories.
+## 40 Increase memory limit
+If earlier in config /etc/php/8.*/apache2/php.ini you set memory_limit = 2048M then you need to add a line to config. This is necessary, for example, for correct preview of large images in Memories app.
 ```bash
 sudo vim  /var/www/nextcloud/config/config.php
 ```
@@ -946,25 +947,25 @@ sudo vim  /var/www/nextcloud/config/config.php
 
 # Collabora install
 
-## Создать dns запись
-Создаем доменную "A" запись на том-же хостинге где делали cloud.mydomain.com
-В данном примере это будет **collabora.mydomain.com**
+## 1 Create dns record
+Create an "A" domain record at the same hosting where you did cloud.mydomain.com\
+In this example it will be **collabora.mydomain.com**
 
-## Установка Nextcloud Office
-В web интерефейсе идем в Apps и устнавливаем там приложение "Nextcloud Office"
+## 2 Install Nextcloud Office
+In web interface go to Apps and install "Nextcloud Office" app
 
-## Импорт ключа официального репозитория
-Установим gnupg
+## 3 Import official repository key
+Install gnupg
 ```bash
 sudo apt install gnupg
 ```
-Скачаем ключи репозитория collabora ([ссылка](https://sdk.collaboraonline.com/docs/installation/Installation_from_packages.html))
+Download collabora repository keys ([link](https://sdk.collaboraonline.com/docs/installation/Installation_from_packages.html))
 ```bash
 cd /usr/share/keyrings
 sudo wget https://collaboraoffice.com/downloads/gpg/collaboraonline-release-keyring.gpg
 ```
 
-## Добавим репозиторий в /etc/apt/sources.list.d
+## 4 Add repository to /etc/apt/sources.list.d
 ```bash
 sudo vim /etc/apt/sources.list.d/collaboraonline.sources
 ```
@@ -975,7 +976,7 @@ Suites: ./
 Signed-By: /usr/share/keyrings/collaboraonline-release-keyring.gpg
 ```
 
-## Установка Collabora
+## 5 Install Collabora
 ```bash
 sudo apt update
 ```
@@ -983,12 +984,16 @@ sudo apt update
 sudo apt install coolwsd code-brand hunspell collaboraoffice*
 ```
 
-## Настройка Apache для Collabora
-Создаем шаблон конфига
+## 6 Configure Apache for Collabora
+Create config template
 ```bash
 sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/collabora.conf
 ```
-Редактируем файл (закомментированные строки при желании можно удалить).
+Disable default apache page
+```
+sudo mv /var/www/html/index.html /var/www/html/index.html.bak
+```
+Edit file (commented lines can be deleted if desired).
 ```bash
 sudo vim /etc/apache2/sites-available/collabora.conf
 ```
@@ -996,27 +1001,27 @@ sudo vim /etc/apache2/sites-available/collabora.conf
         ServerName collabora.mydomain.com
 ```
 ```
-        # Удалить или закомментировать строки:
+        # Delete or comment out lines:  
         ServerAdmin
         DocumentRoot
 ```
-Активируем конфиг collabora в apache
+Enable collabora config in apache
 ```bash
 sudo a2ensite collabora && sudo systemctl reload apache2
 ```
 
-## Включаем модули apache
+## 7 Enable apache modules
 ```bash
 sudo a2enmod proxy proxy_wstunnel proxy_http proxy_connect
 ```
 
-## Получить SSL сертификат
-### Через certbot
-Используем команду certbot
+## 8 Get SSL certificate
+### 8.1 Via certbot
+Use certbot command
 ```bash
 sudo certbot --apache
 ```
-В конфиг файл, созданны certbot'ом добавляем следующие строки:
+In config file created by certbot add the following lines:
 ```bash
 sudo vim /etc/apache2/sites-enabled/collabora-le-ssl.conf
 ```
@@ -1063,8 +1068,8 @@ sudo vim /etc/apache2/sites-enabled/collabora-le-ssl.conf
         CustomLog /var/log/apache2/collabora-access.log combined
 ```
 
-### Настройка сертификатов вручную
-Создаем конфиг файл. В данной инструкции предполагается что у вас сертификаты подходят на весь домен (*.mydoamin.com). Если у вас отдельные ключ и сертификат для collabora, вам необходимо подгрузить их на сервер и ипоменять к ним пути в конфиге ниже и выдать права как и у сертификатов cloud.
+### 8.1 Manual certificate setup
+Create config file. In this instruction it is assumed you have certificates valid for the entire domain (*.mydomain.com). If you have a separate key and certificate for collabora, you need to upload them to server, change paths in config below and set permissions same as cloud certificates.
 ```bash
 sudo vim /etc/apache2/sites-available/collabora-ssl.conf
 ```
@@ -1122,50 +1127,50 @@ sudo vim /etc/apache2/sites-available/collabora-ssl.conf
 </IfModule>
 ```
 
-Ативируем конфиг в apache
+Enable config in apache
 ```bash
 sudo a2ensite collabora-ssl.conf
 ```
 
-### Для обоих вариантов
-Активируем модуль ssl если не активирован
+### 8.2 For both options
+Enable ssl module if not enabled
 ```bash
 sudo a2enmod ssl
 ```
-Перезапускаем apache
+Restart apache
 ```bash
 sudo systemctl reload apache2
 ```
 
-## Настройка логов
-Создадим файлы логов
+## 9 Configure logs
+Create log files
 ```bash
 sudo install -o root -g adm -m 0640 /dev/null /var/log/apache2/collabora-error.log
 sudo install -o root -g adm -m 0640 /dev/null /var/log/apache2/collabora-access.log
 ```
 
-## Настроить конфиг collabora
-В Collabora языки используются для оформления интерфейса collabora и для проверки орфографии. В больших текстовых файлах проверка орфографии большого кол-ва языков может замедлять производительность. Рекомендуется оставить только нужные языки.
+## 10 Configure collabora config
+In Collabora languages are used for interface layout and spell check. In large text files spell checking many languages may slow performance. It is recommended to keep only needed languages.
 
-Посметреть какие языки сейчас в конфиге
+Check which languages are currently in config
 ```bash
 sudo grep en_US.*ru /etc/coolwsd/coolwsd.xml
 ```
-Оставить только нужные языки (в данном примере это en_US ru)
+Keep only needed languages (in this example "en_US ru")
 ```bash
 sudo sed -i 's/de_DE en_GB en_US es_ES fr_FR it nl pt_BR pt_PT ru/en_US ru/g' /etc/coolwsd/coolwsd.xml
 ```
-Убедиться что строка изменилась корректно
+Make sure the line changed correctly
 ```bash
 sudo grep en_US.*ru /etc/coolwsd/coolwsd.xml
 ```
-Отключаем шифрование трафика collabora т.к. при таком /etc/redis/redis.conf обмен данными будет идти через сокет локально
+Disable collabora traffic encryption since with such /etc/redis/redis.conf data exchange will go through local socket
 ```bash
 sudo coolconfig set ssl.enable false
 sudo coolconfig set ssl.termination true
 ```
 
-## Перезапускаем collabora и apache
+## 11 Restart collabora and apache
 ```bash
 sudo systemctl restart apache2
 sudo systemctl status apache2
@@ -1175,30 +1180,30 @@ sudo systemctl restart coolwsd
 sudo systemctl status coolwsd
 ```
 
-## Включить Collabora в Nextcloud
-На сайте переходим в меню "Администрирование" и находим там вкладку "Office".
-Выбираем меню "Использовать свой сервер" и вводим 
+## 12 Enable Collabora in Nextcloud
+On the site go to "Administration" menu and find "Office" tab.
+Choose "Use your own server" and enter
 ```
 https://collabora.mydomain.com
 ```
-Ниже находим меню "Allow list for WOPI requests" и вводим ip адрес сервера (в данной инструкции он знаком вам как 12.34.56.100)
+Below find "Allow list for WOPI requests" and enter the server IP (in this instruction it is known to you as 12.34.56.100)
 
-## Траблшут collabora
+## 13 Troubleshoot collabora
 https://sdk.collaboraonline.com/docs/installation/Collabora_Online_Troubleshooting_Guide.html
 ```bash
 journalctl -e -u coolwsd | lnav
 journalctl -r -u coolwsd | lnav
 ```
 
-# Настройка LDAP (ActiveDirectory authentication)
+# LDAP setup (ActiveDirectory authentication)
 
-# Обновление версии Nextcloud
+# Update Nextcloud version
 
-# Удаление пользователей
+# User deletion
 
-# Перенос сервера
+# Move nextcloud to another server
 
-# Смена DNS имени
+# Change Nextcloud DNS name
 
 
 
