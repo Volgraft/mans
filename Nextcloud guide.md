@@ -265,7 +265,7 @@ general_log_file = /var/log/mysql/general.log
 slow_query_log_file = /var/log/mysql/slow.log
 
 long_query_time = 2
-max_connections = 500
+max_connections = 200
 wait_timeout = 300
 interactive_timeout = 300
 
