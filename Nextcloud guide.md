@@ -615,6 +615,11 @@ Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains
 </IfModule>
 ```
 
+Restart apache
+```
+sudo systemctl restart apache2
+```
+
 ### 30.1 Manual setup
 On the server, create ssl directory
 ```bash
