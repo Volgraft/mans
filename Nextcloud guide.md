@@ -22,6 +22,10 @@ automatically at OS startup
 ```powershell
 Get-Service -Name ssh-agent | Set-Service -StartupType Automatic
 ```
+#### start service
+```
+start-service ssh-agent
+```
 #### check agent status
 ```powershell
 Get-Service ssh-agent | Select Name, Status, StartType, DisplayName
