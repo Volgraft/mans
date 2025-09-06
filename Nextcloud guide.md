@@ -415,7 +415,7 @@ sudo vim /etc/apache2/sites-available/nextcloud.conf
 sudo a2ensite nextcloud.conf
 ```
 
-## 22 Edit apache config
+## 22 Edit php config
 ### 22.1 Ubuntu 24.04
 Check current important settings
 ```bash
@@ -614,7 +614,14 @@ Header always set Strict-Transport-Security "max-age=15552000; includeSubDomains
 </VirtualHost>
 </IfModule>
 ```
-
+Enable ssl module in apache
+```bash
+sudo a2enmod ssl
+```
+Enable  https config
+```bash
+sudo a2ensite nextcloud-le-ssl.conf
+```
 Restart apache
 ```
 sudo systemctl restart apache2
